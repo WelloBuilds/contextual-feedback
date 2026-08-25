@@ -1,0 +1,15 @@
+{
+  "name": "testapp",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@contextual-feedback/sdk": "../packages/sdk"
+  }
+}
