@@ -8,8 +8,17 @@
         "typescript": "^7.0.2",
       },
     },
+    "packages/sdk": {
+      "name": "@contextual-feedback/sdk",
+      "version": "0.1.0",
+      "devDependencies": {
+        "typescript": "^7.0.2",
+      },
+    },
   },
   "packages": {
+    "@contextual-feedback/sdk": ["@contextual-feedback/sdk@workspace:packages/sdk"],
+
     "@typescript/typescript-aix-ppc64": ["@typescript/typescript-aix-ppc64@7.0.2", "", { "os": "aix", "cpu": "ppc64" }, "sha512-MTKKkWB7p/0E9xi1d1tHtZ5PiLkGEMIq88pK2CubZjOsLtYTLqhgIgi6zepFa+9GHZ6h05NMCkQxGKiPXMxXtQ=="],
 
     "@typescript/typescript-darwin-arm64": ["@typescript/typescript-darwin-arm64@7.0.2", "", { "os": "darwin", "cpu": "arm64" }, "sha512-gowzar9MwS/aRWp6f3a4KUqzRjAZjOsmGNCM6LcTgXum+dBfgsBVMN+AgvOCCbguXyick6LJhpBszxMebJ8syA=="],

@@ -1,6 +1,6 @@
-import { ClickEvent } from "../events/clickEvent";
-import { EventType } from "../events/eventTypes";
-import { Event } from "../events/event";
+import { ClickEvent } from "../events/clickEvent.js";
+import { EventType } from "../events/eventTypes.js";
+import { Event } from "../events/event.js";
 
 export const clickDetector = () => {
   document.addEventListener("click", (e) => {
