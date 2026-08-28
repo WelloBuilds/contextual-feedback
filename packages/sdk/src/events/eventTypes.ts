@@ -1,3 +1,4 @@
 export enum EventType {
-    click = "click",
-};
+  click = "click",
+  pageView = "pageView",
+}
