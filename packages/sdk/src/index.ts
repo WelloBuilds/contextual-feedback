@@ -1,4 +1,4 @@
-import { clickDetector } from "./detection/clickDetector.js";
+import { clicks} from "./detection/clicks.js";
 import { pageViewDetector } from "./detection/pageView.js";
 
 export interface InitOptions {
@@ -8,7 +8,7 @@ export interface InitOptions {
 function init(options: InitOptions): void {
   console.log("SDK initialized");
 
-  clickDetector();
+  clicks();
   pageViewDetector();
 }
 
