@@ -1,4 +1,4 @@
-import { EventType, PageView, PageViewTypes, Event } from "../events";
+import { EventType, PageViewTypes, Event, PageViewPayload } from "../events";
 
 export const pageViewDetector = () => {
   let previousUrl = window.location.href;
@@ -11,7 +11,7 @@ export const pageViewDetector = () => {
     const targetUrl =
       args[2] == null ? currentUrl : new URL(args[2], currentUrl).href;
 
-    const pageViewPayload: PageView = {
+    const pageViewPayload: PageViewPayload = {
       previousUrl: currentUrl,
       targetUrl,
       type: PageViewTypes.pushState,
@@ -36,7 +36,7 @@ export const pageViewDetector = () => {
   window.addEventListener("popstate", () => {
     const targetUrl = window.location.href;
 
-    const pageViewPayload: PageView = {
+    const pageViewPayload: PageViewPayload = {
       previousUrl,
       targetUrl,
       type: PageViewTypes.popState,

@@ -1,6 +1,4 @@
-import { EventType } from "./eventTypes.js";
-
-export type ClickEvent = {
+export type ClickPayload = {
   id: string | null;
   className : string | null;
   tagName : string | null;

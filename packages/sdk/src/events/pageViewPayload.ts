@@ -1,4 +1,4 @@
-export type PageView = {
+export type PageViewPayload = {
   previousUrl: string;
   targetUrl: string;
   type: PageViewTypes | undefined | null;

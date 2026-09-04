@@ -1,4 +1,4 @@
 export * from "./event.js";
 export * from "./eventTypes.js";
-export * from "./clickEvent.js";
-export * from "./pageView.js";
+export * from "./clickPayload.js";
+export * from "./pageViewPayload.js";

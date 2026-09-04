@@ -1,4 +1,4 @@
-import { ClickEvent } from "../events/clickEvent.js";
+import { ClickPayload } from "../events/clickPayload.js";
 import { EventType } from "../events/eventTypes.js";
 import { Event } from "../events/event.js";
 
@@ -9,7 +9,7 @@ export const clicks = () => {
     if (!(target instanceof HTMLElement)) return;
     const interactionTarget = target.closest("button, a, input, select, textarea") ?? target;
 
-    const clickPayload: ClickEvent = {
+    const clickPayload: ClickPayload = {
       id: interactionTarget.id ,
       className : interactionTarget.className ,
       tagName : interactionTarget.tagName,
