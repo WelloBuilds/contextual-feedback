@@ -1,8 +1,9 @@
 import { EventType } from "../events/eventTypes.js";
 import { FormInputPayload } from "../events/formInputPayload.js";
 import { Event } from "../events/event.js";
+import { EventQueue } from "../queue/eventQueue.js";
 
-export const formInput = () => {
+export const formInput = (eventQueue : EventQueue) => {
   document.addEventListener("change", (e) => {
     const target = e.target;
 
@@ -28,6 +29,6 @@ export const formInput = () => {
       createdAt: new Date(),
     };
 
-    console.log("form input", feedbackEvent);
+    eventQueue.add(feedbackEvent);
   });
 };

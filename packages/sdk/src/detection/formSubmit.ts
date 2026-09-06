@@ -1,8 +1,9 @@
 import { EventType } from "../events/eventTypes.js";
 import { FormSubmitPayload } from "../events/formSubmitPayload.js";
 import { Event } from "../events/event.js";
+import { EventQueue } from "../queue/eventQueue.js";
 
-export const formSubmit = () => {
+export const formSubmit = (eventQueue : EventQueue) => {
   document.addEventListener("submit", (e) => {
     const target = e.target;
 
@@ -21,6 +22,6 @@ export const formSubmit = () => {
       payload: formSubmitPayload,
       createdAt: new Date(),
     };
-    console.log("feedbackEvent", feedbackEvent);
+    eventQueue.add(feedbackEvent);
   });
 };

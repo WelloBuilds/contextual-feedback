@@ -1,8 +1,9 @@
 import { ClickPayload } from "../events/clickPayload.js";
 import { EventType } from "../events/eventTypes.js";
 import { Event } from "../events/event.js";
+import { EventQueue } from "../queue/eventQueue.js";
 
-export const clicks = () => {
+export const clicks = (eventQueue : EventQueue) => {
   document.addEventListener("click", (e) => {
     
     const target = e.target;
@@ -23,7 +24,8 @@ export const clicks = () => {
       payload: clickPayload,
       createdAt: new Date(),
     };
-    console.log(feedbackEvent);
+    
+    eventQueue.add(feedbackEvent)
 
   });
 };

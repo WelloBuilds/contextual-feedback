@@ -1,6 +1,7 @@
 import { EventType, PageViewTypes, Event, PageViewPayload } from "../events";
+import { EventQueue } from "../queue/eventQueue";
 
-export const pageViewDetector = () => {
+export const pageViewDetector = (eventQueue : EventQueue) => {
   let previousUrl = window.location.href;
 
   const originalPushState = window.history.pushState;
@@ -24,7 +25,7 @@ export const pageViewDetector = () => {
       createdAt: new Date(),
     };
 
-    console.log(feedbackEvent);
+    eventQueue.add(feedbackEvent);
 
     const result = originalPushState.apply(this, args);
 
@@ -49,7 +50,7 @@ export const pageViewDetector = () => {
       createdAt: new Date(),
     };
 
-    console.log(feedbackEvent);
+    eventQueue.add(feedbackEvent);
 
     previousUrl = targetUrl;
   });

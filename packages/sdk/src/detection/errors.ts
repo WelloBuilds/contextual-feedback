@@ -1,8 +1,9 @@
 import { ErrorPayload } from "../events/errorPayload"
 import { EventType } from "../events/eventTypes"
 import { Event } from "../events/event"
+import { EventQueue } from "../queue/eventQueue.js";
 
-export const errors = () => {
+export const errors = (eventQueue : EventQueue) => {
     window.addEventListener('error' , (e)=>{
         const errorPayload: ErrorPayload = {
             type: 'uncaughtException',
@@ -14,7 +15,7 @@ export const errors = () => {
             payload: errorPayload,
             createdAt: new Date()
         }
-        console.log(feedbackEvent)
+        eventQueue.add(feedbackEvent)
     })
     window.addEventListener('unhandledrejection' , (e)=>{
 
@@ -35,6 +36,6 @@ export const errors = () => {
             payload: errorPayload,
             createdAt: new Date()
         }
-        console.log(feedbackEvent)
+        eventQueue.add(feedbackEvent)
     })
 }
