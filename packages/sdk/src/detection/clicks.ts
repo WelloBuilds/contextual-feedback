@@ -2,8 +2,9 @@ import { ClickPayload } from "../events/clickPayload.js";
 import { EventType } from "../events/eventTypes.js";
 import { Event } from "../events/event.js";
 import { EventQueue } from "../queue/eventQueue.js";
+import { SessionManager } from "../session/sessionManager.js";
 
-export const clicks = (eventQueue : EventQueue) => {
+export const clicks = (eventQueue : EventQueue, sessionManager : SessionManager) => {
   document.addEventListener("click", (e) => {
     
     const target = e.target;
@@ -26,6 +27,7 @@ export const clicks = (eventQueue : EventQueue) => {
     };
     
     eventQueue.add(feedbackEvent)
+    sessionManager.newActivity()
 
   });
 };

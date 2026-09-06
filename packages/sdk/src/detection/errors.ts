@@ -2,8 +2,9 @@ import { ErrorPayload } from "../events/errorPayload"
 import { EventType } from "../events/eventTypes"
 import { Event } from "../events/event"
 import { EventQueue } from "../queue/eventQueue.js";
+import { SessionManager } from "../session/sessionManager";
 
-export const errors = (eventQueue : EventQueue) => {
+export const errors = (eventQueue : EventQueue, sessionManager: SessionManager) => {
     window.addEventListener('error' , (e)=>{
         const errorPayload: ErrorPayload = {
             type: 'uncaughtException',
@@ -37,5 +38,6 @@ export const errors = (eventQueue : EventQueue) => {
             createdAt: new Date()
         }
         eventQueue.add(feedbackEvent)
+        sessionManager.newActivity()
     })
 }

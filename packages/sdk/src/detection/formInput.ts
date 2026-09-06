@@ -2,8 +2,9 @@ import { EventType } from "../events/eventTypes.js";
 import { FormInputPayload } from "../events/formInputPayload.js";
 import { Event } from "../events/event.js";
 import { EventQueue } from "../queue/eventQueue.js";
+import { SessionManager } from "../session/sessionManager.js";
 
-export const formInput = (eventQueue : EventQueue) => {
+export const formInput = (eventQueue : EventQueue, sessionManager:SessionManager) => {
   document.addEventListener("change", (e) => {
     const target = e.target;
 
@@ -30,5 +31,7 @@ export const formInput = (eventQueue : EventQueue) => {
     };
 
     eventQueue.add(feedbackEvent);
+    sessionManager.newActivity();
+
   });
 };

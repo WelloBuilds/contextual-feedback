@@ -1,7 +1,8 @@
 import { EventType, PageViewTypes, Event, PageViewPayload } from "../events";
 import { EventQueue } from "../queue/eventQueue";
+import { SessionManager } from "../session/sessionManager";
 
-export const pageViewDetector = (eventQueue : EventQueue) => {
+export const pageViewDetector = (eventQueue : EventQueue, sessionManager: SessionManager) => {
   let previousUrl = window.location.href;
 
   const originalPushState = window.history.pushState;
@@ -26,6 +27,7 @@ export const pageViewDetector = (eventQueue : EventQueue) => {
     };
 
     eventQueue.add(feedbackEvent);
+    sessionManager.newActivity();
 
     const result = originalPushState.apply(this, args);
 
@@ -51,6 +53,7 @@ export const pageViewDetector = (eventQueue : EventQueue) => {
     };
 
     eventQueue.add(feedbackEvent);
+    sessionManager.newActivity();
 
     previousUrl = targetUrl;
   });
