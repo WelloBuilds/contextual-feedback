@@ -1,8 +1,11 @@
 import { Event } from "../events/event.js";
+import { Transport } from "../transport/transport.js";
 
 export class EventQueue {
     private events: Event[] =[] ;
     private flushTimer: number | null = null 
+
+    constructor(private transport:Transport){}
 
     public add ( event: Event ){
         this.events.push(event);
@@ -24,8 +27,8 @@ export class EventQueue {
     }
 
     private flush(){
-        console.log("FLUSH", this.events);
-        this.events = [];
+        this.transport.send(this.events);
+        this.events = []; 
         this.clearTimer();
     }
 
