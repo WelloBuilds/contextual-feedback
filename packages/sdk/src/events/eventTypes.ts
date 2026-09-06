@@ -3,4 +3,5 @@ export enum EventType {
   pageView = "pageView",
   error = "error",
   formInput = "formInput",
+  formSubmit = "formSubmit"
 }
