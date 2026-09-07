@@ -24,11 +24,11 @@ export class SessionManager {
 
             if (timeDifference < thirtyMinutes) {
                 this.updateLastActivityAt(currentDate);
-                return;
+                return this.sessionId;
             }
         }
 
-        this.createNewSession();
+        return this.createNewSession();
     }
 
     private readSession(): Session | null {
@@ -68,5 +68,7 @@ export class SessionManager {
             "feedback_session",
             JSON.stringify(session)
         );
+        
+        return this.sessionId;
     }
 }

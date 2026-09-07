@@ -5,6 +5,8 @@ import { EventQueue } from "../queue/eventQueue.js";
 import { SessionManager } from "../session/sessionManager";
 
 export const errors = (eventQueue : EventQueue, sessionManager: SessionManager) => {
+    const sessionId = sessionManager.newActivity();
+
     window.addEventListener('error' , (e)=>{
         const errorPayload: ErrorPayload = {
             type: 'uncaughtException',
@@ -12,6 +14,7 @@ export const errors = (eventQueue : EventQueue, sessionManager: SessionManager) 
         }
         const feedbackEvent: Event = {
             id: crypto.randomUUID(),
+            sessionId: sessionId,
             type: EventType.error,
             payload: errorPayload,
             createdAt: new Date()
@@ -33,6 +36,7 @@ export const errors = (eventQueue : EventQueue, sessionManager: SessionManager) 
         }
         const feedbackEvent: Event = {
             id: crypto.randomUUID(),
+            sessionId: sessionId,
             type: EventType.error,
             payload: errorPayload,
             createdAt: new Date()

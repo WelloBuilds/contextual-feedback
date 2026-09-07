@@ -5,6 +5,8 @@ import { EventQueue } from "../queue/eventQueue.js";
 import { SessionManager } from "../session/sessionManager.js";
 
 export const clicks = (eventQueue : EventQueue, sessionManager : SessionManager) => {
+  const sessionId = sessionManager.newActivity();
+
   document.addEventListener("click", (e) => {
     
     const target = e.target;
@@ -21,6 +23,7 @@ export const clicks = (eventQueue : EventQueue, sessionManager : SessionManager)
 
     const feedbackEvent: Event = {
       id: crypto.randomUUID(),
+      sessionId: sessionId,
       type: EventType.click,
       payload: clickPayload,
       createdAt: new Date(),

@@ -7,6 +7,7 @@ import type { FormSubmitPayload } from "./formSubmitPayload.js";
 
 export type Event = {
   id: string;
+  sessionId: string;
   type: EventType;
   payload: ClickPayload | PageViewPayload | ErrorPayload | FormInputPayload | FormSubmitPayload;
   createdAt: Date;

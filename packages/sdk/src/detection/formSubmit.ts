@@ -5,6 +5,9 @@ import { EventQueue } from "../queue/eventQueue.js";
 import { SessionManager } from "../session/sessionManager.js";
 
 export const formSubmit = (eventQueue : EventQueue, sessionManager: SessionManager) => {
+
+  const sessionId = sessionManager.newActivity();
+
   document.addEventListener("submit", (e) => {
     const target = e.target;
 
@@ -19,6 +22,7 @@ export const formSubmit = (eventQueue : EventQueue, sessionManager: SessionManag
     };
     const feedbackEvent: Event = {
       id: crypto.randomUUID(),
+      sessionId: sessionId,
       type: EventType.formSubmit,
       payload: formSubmitPayload,
       createdAt: new Date(),

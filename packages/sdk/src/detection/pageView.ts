@@ -4,6 +4,7 @@ import { SessionManager } from "../session/sessionManager";
 
 export const pageViewDetector = (eventQueue : EventQueue, sessionManager: SessionManager) => {
   let previousUrl = window.location.href;
+  const sessionId = sessionManager.newActivity();
 
   const originalPushState = window.history.pushState;
 
@@ -21,6 +22,7 @@ export const pageViewDetector = (eventQueue : EventQueue, sessionManager: Sessio
 
     const feedbackEvent: Event = {
       id: crypto.randomUUID(),
+      sessionId: sessionId,
       type: EventType.pageView,
       payload: pageViewPayload,
       createdAt: new Date(),
@@ -45,8 +47,11 @@ export const pageViewDetector = (eventQueue : EventQueue, sessionManager: Sessio
       type: PageViewTypes.popState,
     };
 
+    const sessionId = sessionManager.newActivity();
+
     const feedbackEvent: Event = {
       id: crypto.randomUUID(),
+      sessionId: sessionId,
       type: EventType.pageView,
       payload: pageViewPayload,
       createdAt: new Date(),

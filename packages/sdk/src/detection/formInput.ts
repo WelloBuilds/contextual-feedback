@@ -5,6 +5,8 @@ import { EventQueue } from "../queue/eventQueue.js";
 import { SessionManager } from "../session/sessionManager.js";
 
 export const formInput = (eventQueue : EventQueue, sessionManager:SessionManager) => {
+  const sessionId = sessionManager.newActivity();
+
   document.addEventListener("change", (e) => {
     const target = e.target;
 
@@ -25,6 +27,7 @@ export const formInput = (eventQueue : EventQueue, sessionManager:SessionManager
 
     const feedbackEvent: Event = {
       id: crypto.randomUUID(),
+      sessionId: sessionId,
       type: EventType.formInput,
       payload: formInputPayload,
       createdAt: new Date(),
