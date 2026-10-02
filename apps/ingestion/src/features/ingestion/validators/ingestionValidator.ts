@@ -12,6 +12,9 @@ const eventCommonSchema = z.object({
     sessionId: z.uuid({
         error: "An invalid session ID was entered",
     }),
+    createdAt: z.coerce.date({
+        error: "An invalid created at date was entered",
+    }),
 });
 
 const clickEventSchema = eventCommonSchema.extend({

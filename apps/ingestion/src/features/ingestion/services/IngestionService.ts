@@ -1,5 +1,6 @@
+import { db } from "../../../db"
 import type { Event } from "../types/eventType"
-
+import { events as eventsTable } from "../../../models/event.model";
 export default class IngestionService {
 
 	// ------------------------------------------------------------
@@ -9,9 +10,14 @@ export default class IngestionService {
         message: string,
         events: Event[]
     }> {
-        return ({
-            message: "events Received",
-            events: events
-        });
+        const insertedEvents = await db
+            .insert(eventsTable)
+            .values(events)
+            .returning();
+
+        return {
+            message: "Events received",
+            events: insertedEvents as Event[],
+        };
 	}
 }

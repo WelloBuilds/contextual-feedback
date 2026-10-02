@@ -19,6 +19,13 @@
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "@types/pg": "^8.23.1",
+    "drizzle-kit": "^1.0.0-rc.4",
     "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "drizzle-orm": "^1.0.0-rc.4",
+    "pg": "^8.23.0",
+    "postgres": "^3.4.9"
   }
 }
