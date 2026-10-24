@@ -4,7 +4,6 @@ import { SessionManager } from "../session/sessionManager";
 
 export const pageViewDetector = (eventQueue : EventQueue, sessionManager: SessionManager) => {
   let previousUrl = window.location.href;
-  const sessionId = sessionManager.newActivity();
 
   const originalPushState = window.history.pushState;
 
@@ -20,6 +19,8 @@ export const pageViewDetector = (eventQueue : EventQueue, sessionManager: Sessio
       type: PageViewTypes.pushState,
     };
 
+    const sessionId = sessionManager.newActivity();
+
     const feedbackEvent: Event = {
       id: crypto.randomUUID(),
       sessionId: sessionId,
@@ -29,7 +30,6 @@ export const pageViewDetector = (eventQueue : EventQueue, sessionManager: Sessio
     };
 
     eventQueue.add(feedbackEvent);
-    sessionManager.newActivity();
 
     const result = originalPushState.apply(this, args);
 
@@ -58,7 +58,6 @@ export const pageViewDetector = (eventQueue : EventQueue, sessionManager: Sessio
     };
 
     eventQueue.add(feedbackEvent);
-    sessionManager.newActivity();
 
     previousUrl = targetUrl;
   });

@@ -10,9 +10,18 @@ export default class IngestionService {
         message: string,
         events: Event[]
     }> {
+        const values = events.map((event) => ({
+            id: event.id,
+            sessionId: event.sessionId,
+            type: event.type,
+            payload: event.payload,
+            createdAt: event.createdAt,
+            deletedAt: null,
+        }));
+
         const insertedEvents = await db
             .insert(eventsTable)
-            .values(events)
+            .values(values)
             .returning();
 
         return {
