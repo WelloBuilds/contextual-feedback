@@ -3,6 +3,7 @@ import { EventType } from "../events/eventTypes"
 import { Event } from "../events/event"
 import { EventQueue } from "../queue/eventQueue.js";
 import { SessionManager } from "../session/sessionManager";
+import { getVisitorId } from "../auth/visitorId";
 
 export const errors = (eventQueue : EventQueue, sessionManager: SessionManager) => {
     window.addEventListener('error' , (e)=>{
@@ -12,9 +13,11 @@ export const errors = (eventQueue : EventQueue, sessionManager: SessionManager) 
         }
 
         const sessionId = sessionManager.newActivity();
+        const visitorId = getVisitorId();
 
         const feedbackEvent: Event = {
             id: crypto.randomUUID(),
+            visitorId: visitorId,
             sessionId: sessionId,
             type: EventType.error,
             payload: errorPayload,
@@ -37,9 +40,11 @@ export const errors = (eventQueue : EventQueue, sessionManager: SessionManager) 
         }
 
         const sessionId = sessionManager.newActivity();
+        const visitorId = getVisitorId();
 
         const feedbackEvent: Event = {
             id: crypto.randomUUID(),
+            visitorId: visitorId,
             sessionId: sessionId,
             type: EventType.error,
             payload: errorPayload,

@@ -1,3 +1,4 @@
+import { getVisitorId } from "../auth/visitorId";
 import { EventType, PageViewTypes, Event, PageViewPayload } from "../events";
 import { EventQueue } from "../queue/eventQueue";
 import { SessionManager } from "../session/sessionManager";
@@ -19,10 +20,12 @@ export const pageViewDetector = (eventQueue : EventQueue, sessionManager: Sessio
       type: PageViewTypes.pushState,
     };
 
-    const sessionId = sessionManager.newActivity();
+    const sessionId = sessionManager.newActivity()
+    const visitorId = getVisitorId()
 
     const feedbackEvent: Event = {
       id: crypto.randomUUID(),
+      visitorId: visitorId,
       sessionId: sessionId,
       type: EventType.pageView,
       payload: pageViewPayload,
@@ -48,9 +51,11 @@ export const pageViewDetector = (eventQueue : EventQueue, sessionManager: Sessio
     };
 
     const sessionId = sessionManager.newActivity();
+    const visitorId = getVisitorId()
 
     const feedbackEvent: Event = {
       id: crypto.randomUUID(),
+      visitorId: visitorId,
       sessionId: sessionId,
       type: EventType.pageView,
       payload: pageViewPayload,

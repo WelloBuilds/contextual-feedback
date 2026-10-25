@@ -3,6 +3,7 @@ import { EventType } from "../events/eventTypes.js";
 import { Event } from "../events/event.js";
 import { EventQueue } from "../queue/eventQueue.js";
 import { SessionManager } from "../session/sessionManager.js";
+import { getVisitorId } from "../auth/visitorId.js";
 
 export const clicks = (eventQueue : EventQueue, sessionManager : SessionManager) => {
   document.addEventListener("click", (e) => {
@@ -20,9 +21,11 @@ export const clicks = (eventQueue : EventQueue, sessionManager : SessionManager)
     };
 
     const sessionId = sessionManager.newActivity();
+    const visitorId = getVisitorId();
 
     const feedbackEvent: Event = {
       id: crypto.randomUUID(),
+      visitorId: visitorId,
       sessionId: sessionId,
       type: EventType.click,
       payload: clickPayload,

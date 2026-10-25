@@ -12,6 +12,7 @@ export default class IngestionService {
     }> {
         const values = events.map((event) => ({
             id: event.id,
+            visitorId: event.visitorId,
             sessionId: event.sessionId,
             type: event.type,
             payload: event.payload,

@@ -3,6 +3,7 @@ import { FormSubmitPayload } from "../events/formSubmitPayload.js";
 import { Event } from "../events/event.js";
 import { EventQueue } from "../queue/eventQueue.js";
 import { SessionManager } from "../session/sessionManager.js";
+import { getVisitorId } from "../auth/visitorId.js";
 
 export const formSubmit = (eventQueue : EventQueue, sessionManager: SessionManager) => {
 
@@ -19,10 +20,12 @@ export const formSubmit = (eventQueue : EventQueue, sessionManager: SessionManag
       method: target.method,
     };
 
-    const sessionId = sessionManager.newActivity();
+    const sessionId = sessionManager.newActivity()
+    const visitorId = getVisitorId()
 
     const feedbackEvent: Event = {
       id: crypto.randomUUID(),
+      visitorId: visitorId,
       sessionId: sessionId,
       type: EventType.formSubmit,
       payload: formSubmitPayload,

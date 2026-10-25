@@ -8,6 +8,7 @@ import { PageViewPayload } from "./pageViewPayloadType";
 export type Event =
     | {
           id: string;
+          visitorId: string,
           sessionId: string;
           createdAt: Date;
           type: EventType.click;
@@ -15,6 +16,7 @@ export type Event =
       }
     | {
           id: string;
+          visitorId: string,
           sessionId: string;
           createdAt: Date;
           type: EventType.error;
@@ -22,6 +24,7 @@ export type Event =
       }
     | {
           id: string;
+          visitorId: string,
           sessionId: string;
           createdAt: Date;
           type: EventType.formInput;
@@ -29,6 +32,7 @@ export type Event =
       }
     | {
           id: string;
+          visitorId: string,
           sessionId: string;
           createdAt: Date;
           type: EventType.formSubmit;
@@ -36,6 +40,7 @@ export type Event =
       }
     | {
           id: string;
+          visitorId: string,
           sessionId: string;
           createdAt: Date;
           type: EventType.pageView;

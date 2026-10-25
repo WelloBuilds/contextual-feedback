@@ -8,6 +8,7 @@ import {
   
   export const events = pgTable("events", {
     id: uuid("id").primaryKey(),
+    visitorId: uuid("visitor_id").notNull(),
     sessionId: uuid("session_id").notNull(),
     type: text("type").notNull(),
     payload: jsonb("payload").notNull(),

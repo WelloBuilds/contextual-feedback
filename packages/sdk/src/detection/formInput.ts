@@ -3,6 +3,7 @@ import { FormInputPayload } from "../events/formInputPayload.js";
 import { Event } from "../events/event.js";
 import { EventQueue } from "../queue/eventQueue.js";
 import { SessionManager } from "../session/sessionManager.js";
+import { getVisitorId } from "../auth/visitorId.js";
 
 export const formInput = (eventQueue : EventQueue, sessionManager:SessionManager) => {
   document.addEventListener("change", (e) => {
@@ -23,10 +24,12 @@ export const formInput = (eventQueue : EventQueue, sessionManager:SessionManager
       tagName: target.tagName,
     };
 
-    const sessionId = sessionManager.newActivity();
+    const sessionId = sessionManager.newActivity()
+    const visitorId = getVisitorId()
 
     const feedbackEvent: Event = {
       id: crypto.randomUUID(),
+      visitorId: visitorId,
       sessionId: sessionId,
       type: EventType.formInput,
       payload: formInputPayload,

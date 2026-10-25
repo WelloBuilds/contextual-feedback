@@ -15,6 +15,13 @@
       "when": 1790969251216,
       "tag": "0001_outgoing_the_renegades",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792911898751,
+      "tag": "0002_wonderful_maestro",
+      "breakpoints": true
     }
   ]
 }

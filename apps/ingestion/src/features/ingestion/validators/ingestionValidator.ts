@@ -8,7 +8,9 @@ const eventCommonSchema = z.object({
     id: z.uuid({
         error: "An invalid event ID was entered",
     }),
-
+    visitorId: z.uuid({
+        error: "An invalid visitor ID was given",
+    }),
     sessionId: z.uuid({
         error: "An invalid session ID was entered",
     }),
