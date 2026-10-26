@@ -5,10 +5,10 @@ import {
     jsonb,
     timestamp,
   } from "drizzle-orm/pg-core";
-import { workspaces } from "./workSpace.model";
+import { workspaces } from "./workspace.model";
   
   export const events = pgTable("events", {
-    id: uuid("id").primaryKey(),
+    id: uuid("id").primaryKey().defaultRandom(),
     visitorId: uuid("visitor_id").notNull(),
     sessionId: uuid("session_id").notNull(),
     workspaceId: uuid("workspace_id").references(() => workspaces.id).notNull(),

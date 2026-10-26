@@ -11,6 +11,13 @@ export default class IngestionController {
 
         const workspaceId = c.req.header("Workspace-Id") ?? c.req.header("workspace-id");
 
+        if (!workspaceId) {
+            return c.json(
+                { error: "A workspace ID header is required" },
+                400
+            )
+        }
+
         const result = IngestionValidator.upload().safeParse({
             ...body,
             workspaceId,
@@ -20,6 +27,14 @@ export default class IngestionController {
             return c.json(
                 {error:result.error},
                 400
+            )
+        }
+
+        const workspaceExists = await IngestionService.validateWorkspace(workspaceId);
+        if (!workspaceExists) {
+            return c.json(
+                { error: "This workspace ID was not identified" },
+                404
             )
         }
 

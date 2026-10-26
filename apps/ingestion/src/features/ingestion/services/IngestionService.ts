@@ -1,8 +1,19 @@
 import { db } from "../../../db"
 import type { Event } from "../types/eventType"
 import { events as eventsTable } from "../../../models/event.model";
-import { workspaces } from "../../../models/workSpace.model";
+import { workspaces } from "../../../models/workspace.model";
+import { workspaceOrigins } from "../../../models/workspaceOrigin.model";
+import { eq } from "drizzle-orm";
 export default class IngestionService {
+    public static async validateWorkspace(workspaceId: string): Promise<boolean> {
+        const existing = await db
+            .select({ id: workspaces.id })
+            .from(workspaces)
+            .where(eq(workspaces.id, workspaceId))
+            .limit(1);
+
+        return existing.length > 0;
+    }
 
 	// ------------------------------------------------------------
 	// MARK: Upload Events 
@@ -11,13 +22,6 @@ export default class IngestionService {
         message: string,
         events: Event[]
     }> {
-        const workspaceIds = [...new Set(events.map((event) => event.workspaceId))];
-
-        await db
-            .insert(workspaces)
-            .values(workspaceIds.map((id) => ({ id, name: "Workspace" })))
-            .onConflictDoNothing();
-
         const values = events.map((event) => ({
             id: event.id,
             visitorId: event.visitorId,
@@ -39,4 +43,17 @@ export default class IngestionService {
             events: insertedEvents as Event[],
         };
 	}
+
+	// ------------------------------------------------------------
+	// MARK: Fetch Workspace Origin
+	// ------------------------------------------------------------
+
+    public static async validateWorkspaceOrigin(workspaceId: string): Promise<string | null> {
+        const workspaceOrigin = await db.select().from(workspaceOrigins).where(eq(workspaceOrigins.workspaceId, workspaceId)).limit(1);
+        if (workspaceOrigin.length === 0) {
+            return null;
+        }
+        return workspaceOrigin[0].origin;
+    }
+
 }
