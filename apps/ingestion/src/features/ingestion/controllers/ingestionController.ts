@@ -9,9 +9,12 @@ export default class IngestionController {
     public static async upload(c: any) {
         const body = await c.req.json()
 
-        const schema = IngestionValidator.upload();
+        const workspaceId = c.req.header("Workspace-Id") ?? c.req.header("workspace-id");
 
-        const result = schema.safeParse(body);
+        const result = IngestionValidator.upload().safeParse({
+            ...body,
+            workspaceId,
+        });
 
         if(!result.success){
             return c.json(
@@ -20,8 +23,13 @@ export default class IngestionController {
             )
         }
 
+        const events = result.data.events.map((event: any) => ({
+            ...event,
+            workspaceId,
+        }));
+
         const response = await IngestionService.upload(
-            result.data.events
+            events
         );
 
         return c.json(response);

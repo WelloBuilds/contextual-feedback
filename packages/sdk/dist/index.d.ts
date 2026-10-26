@@ -1,8 +1,10 @@
-export interface InitOptions {
-    key: string;
-}
-declare function init(options: InitOptions): void;
+export type InitOptions = {
+    workspaceId: string;
+};
+export type FeedbackConfig = InitOptions;
+declare let config: FeedbackConfig | null;
+declare function init(options: FeedbackConfig): void;
 export declare const Feedback: {
     init: typeof init;
 };
-export {};
+export { config };

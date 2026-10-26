@@ -1,6 +1,7 @@
 import { db } from "../../../db"
 import type { Event } from "../types/eventType"
 import { events as eventsTable } from "../../../models/event.model";
+import { workspaces } from "../../../models/workSpace.model";
 export default class IngestionService {
 
 	// ------------------------------------------------------------
@@ -10,9 +11,17 @@ export default class IngestionService {
         message: string,
         events: Event[]
     }> {
+        const workspaceIds = [...new Set(events.map((event) => event.workspaceId))];
+
+        await db
+            .insert(workspaces)
+            .values(workspaceIds.map((id) => ({ id, name: "Workspace" })))
+            .onConflictDoNothing();
+
         const values = events.map((event) => ({
             id: event.id,
             visitorId: event.visitorId,
+            workspaceId: event.workspaceId,
             sessionId: event.sessionId,
             type: event.type,
             payload: event.payload,

@@ -4,10 +4,13 @@ import { errors } from "./detection/errors.js";
 import { formInput } from "./detection/formInput.js";
 import { formSubmit } from "./detection/formSubmit.js";
 import { EventQueue } from "./queue/eventQueue.js";
-import { Transport } from "./transport/transport.js";
+import { Transport, setConfig } from "./transport/transport.js";
 import { SessionManager } from "./session/sessionManager.js";
+let config = null;
 function init(options) {
     console.log("SDK initialized");
+    config = options;
+    setConfig(options);
     const transport = new Transport();
     const eventQueue = new EventQueue(transport);
     const sessionManager = new SessionManager();
@@ -20,3 +23,4 @@ function init(options) {
 export const Feedback = {
     init,
 };
+export { config };

@@ -130,6 +130,12 @@ const eventSchema = z.discriminatedUnion("type", [
 export default class IngestionValidator {
     public static upload() {
         return z.object({
+            workspaceId: z.string({
+                error: "A workspace ID is required",
+            })
+            .uuid({
+                error: "An invalid workspace ID was provided",
+            }),
             events: z
                 .array(eventSchema, {
                     error: "Events must be provided as an array",
@@ -139,7 +145,7 @@ export default class IngestionValidator {
                 })
                 .max(15, {
                     error: "A maximum of 15 events can be uploaded at once",
-                }),
+                })
         });
     }
 }
