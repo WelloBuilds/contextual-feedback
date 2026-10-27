@@ -38,6 +38,15 @@ export default class IngestionController {
             )
         }
 
+        const allowedOrigin = await IngestionService.validateWorkspaceOrigin(workspaceId);
+        const requestOrigin = c.req.header("Origin") ?? c.req.header("Referer");
+        if (allowedOrigin && requestOrigin && allowedOrigin !== requestOrigin) {
+            return c.json(
+                { error: "This origin is not allowed for the workspace" },
+                403
+            )
+        }
+
         const events = result.data.events.map((event: any) => ({
             ...event,
             workspaceId,

@@ -5,15 +5,6 @@ import { workspaces } from "../../../models/workspace.model";
 import { workspaceOrigins } from "../../../models/workspaceOrigin.model";
 import { eq } from "drizzle-orm";
 export default class IngestionService {
-    public static async validateWorkspace(workspaceId: string): Promise<boolean> {
-        const existing = await db
-            .select({ id: workspaces.id })
-            .from(workspaces)
-            .where(eq(workspaces.id, workspaceId))
-            .limit(1);
-
-        return existing.length > 0;
-    }
 
 	// ------------------------------------------------------------
 	// MARK: Upload Events 
@@ -22,6 +13,7 @@ export default class IngestionService {
         message: string,
         events: Event[]
     }> {
+
         const values = events.map((event) => ({
             id: event.id,
             visitorId: event.visitorId,
@@ -43,6 +35,20 @@ export default class IngestionService {
             events: insertedEvents as Event[],
         };
 	}
+
+	// ------------------------------------------------------------
+	// MARK: Fetch Workspace
+	// ------------------------------------------------------------
+
+    public static async validateWorkspace(workspaceId: string): Promise<boolean> {
+        const existing = await db
+            .select({ id: workspaces.id })
+            .from(workspaces)
+            .where(eq(workspaces.id, workspaceId))
+            .limit(1);
+
+        return existing.length > 0;
+    }
 
 	// ------------------------------------------------------------
 	// MARK: Fetch Workspace Origin
