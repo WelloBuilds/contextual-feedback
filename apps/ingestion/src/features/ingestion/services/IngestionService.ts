@@ -21,6 +21,7 @@ export default class IngestionService {
             workspaceId: event.workspaceId,
             sessionId: event.sessionId,
             type: event.type,
+            context: event.context ?? {},
             payload: event.payload,
             createdAt: event.createdAt,
             deletedAt: null,

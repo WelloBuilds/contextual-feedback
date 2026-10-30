@@ -28,4 +28,9 @@ export type RageClickMetrics = {
 export type RageClickEvidence = {
     episodeIds: string[];
     sampleVisitorIds: string[];
+    affectedPages: Array<{
+        id: string | null;
+        path: string;
+        url: string;
+    }>;
 };

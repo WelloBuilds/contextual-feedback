@@ -1,4 +1,5 @@
 import { EventType } from "../events/eventTypes.js";
+import { getEventContext } from "../events/eventContext.js";
 import { FormInputPayload } from "../events/formInputPayload.js";
 import { Event } from "../events/event.js";
 import { EventQueue } from "../queue/eventQueue.js";
@@ -31,6 +32,7 @@ export const formInput = (eventQueue : EventQueue, sessionManager:SessionManager
       id: crypto.randomUUID(),
       visitorId: visitorId,
       sessionId: sessionId,
+      context: getEventContext(),
       type: EventType.formInput,
       payload: formInputPayload,
       createdAt: new Date(),

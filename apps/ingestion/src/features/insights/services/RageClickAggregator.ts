@@ -1,5 +1,6 @@
-import { and, desc, eq, gte, lte } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, lte } from "drizzle-orm";
 import { db } from "../../../db";
+import { events } from "../../../models/event.model";
 import { findings } from "../../../models/finding.model";
 import { rageClickEpisodes } from "../../../models/rageClickEpisode.model";
 import {
@@ -29,12 +30,46 @@ function buildMetrics(episodes: EpisodeRecord[]): RageClickMetrics {
     };
 }
 
-function buildEvidence(episodes: EpisodeRecord[]): RageClickEvidence {
+function isPageContext(value: unknown): value is RageClickEvidence["affectedPages"][number] {
+    if (!value || typeof value !== "object") {
+        return false;
+    }
+
+    const page = value as Record<string, unknown>;
+    return (page.id === null || typeof page.id === "string") &&
+        typeof page.path === "string" &&
+        typeof page.url === "string";
+}
+
+async function getAffectedPages(episodes: EpisodeRecord[]): Promise<RageClickEvidence["affectedPages"]> {
+    const eventIds = [...new Set(episodes.flatMap((episode) => episode.eventIds as string[]))];
+    if (eventIds.length === 0) {
+        return [];
+    }
+
+    const clickEvents = await db
+        .select({ context: events.context })
+        .from(events)
+        .where(inArray(events.id, eventIds));
+    const pages = new Map<string, RageClickEvidence["affectedPages"][number]>();
+
+    for (const { context } of clickEvents) {
+        const page = (context as { page?: unknown } | null)?.page;
+        if (isPageContext(page)) {
+            pages.set(page.id ?? page.url, page);
+        }
+    }
+
+    return [...pages.values()];
+}
+
+async function buildEvidence(episodes: EpisodeRecord[]): Promise<RageClickEvidence> {
     const visitorIds = [...new Set(episodes.map((episode) => episode.visitorId))];
 
     return {
         episodeIds: episodes.map((episode) => episode.id),
         sampleVisitorIds: visitorIds.slice(0, 5),
+        affectedPages: await getAffectedPages(episodes),
     };
 }
 
@@ -98,7 +133,7 @@ export default class RageClickAggregator {
             return;
         }
 
-        const evidence = buildEvidence(episodes);
+        const evidence = await buildEvidence(episodes);
         const { firstSeenAt, lastSeenAt } = getSeenRange(episodes);
         const existingFinding = await getExistingFinding(workspaceId, targetKey);
 

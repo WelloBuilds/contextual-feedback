@@ -1,5 +1,6 @@
 import { getVisitorId } from "../auth/visitorId.js";
 import { EventType } from "../events/eventTypes.js";
+import { getEventContext } from "../events/eventContext.js";
 import type { ClickPayload } from "../events/clickPayload.js";
 import type { Event } from "../events/event.js";
 import { EventQueue } from "../queue/eventQueue.js";
@@ -98,6 +99,7 @@ export const clicks = (eventQueue: EventQueue, sessionManager: SessionManager): 
       id: crypto.randomUUID(),
       visitorId: getVisitorId(),
       sessionId: sessionManager.newActivity(),
+      context: getEventContext(),
       type: EventType.click,
       payload,
       createdAt: new Date(),

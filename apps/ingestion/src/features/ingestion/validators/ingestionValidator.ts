@@ -17,6 +17,13 @@ const eventCommonSchema = z.object({
     createdAt: z.coerce.date({
         error: "An invalid created at date was entered",
     }),
+    context: z.object({
+        page: z.object({
+            id: z.string().max(200).nullable(),
+            path: z.string().max(2048),
+            url: z.url().max(4096),
+        }),
+    }).optional(),
 });
 
 const clickEventSchema = eventCommonSchema.extend({

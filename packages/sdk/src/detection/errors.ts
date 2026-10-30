@@ -1,5 +1,6 @@
 import { ErrorPayload } from "../events/errorPayload"
 import { EventType } from "../events/eventTypes"
+import { getEventContext } from "../events/eventContext.js";
 import { Event } from "../events/event"
 import { EventQueue } from "../queue/eventQueue.js";
 import { SessionManager } from "../session/sessionManager";
@@ -19,6 +20,7 @@ export const errors = (eventQueue : EventQueue, sessionManager: SessionManager) 
             id: crypto.randomUUID(),
             visitorId: visitorId,
             sessionId: sessionId,
+            context: getEventContext(),
             type: EventType.error,
             payload: errorPayload,
             createdAt: new Date()
@@ -46,6 +48,7 @@ export const errors = (eventQueue : EventQueue, sessionManager: SessionManager) 
             id: crypto.randomUUID(),
             visitorId: visitorId,
             sessionId: sessionId,
+            context: getEventContext(),
             type: EventType.error,
             payload: errorPayload,
             createdAt: new Date()

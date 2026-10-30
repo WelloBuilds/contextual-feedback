@@ -1,4 +1,5 @@
 import { EventType } from "../events/eventTypes.js";
+import { getEventContext } from "../events/eventContext.js";
 import { FormSubmitPayload } from "../events/formSubmitPayload.js";
 import { Event } from "../events/event.js";
 import { EventQueue } from "../queue/eventQueue.js";
@@ -27,6 +28,7 @@ export const formSubmit = (eventQueue : EventQueue, sessionManager: SessionManag
       id: crypto.randomUUID(),
       visitorId: visitorId,
       sessionId: sessionId,
+      context: getEventContext(),
       type: EventType.formSubmit,
       payload: formSubmitPayload,
       createdAt: new Date(),

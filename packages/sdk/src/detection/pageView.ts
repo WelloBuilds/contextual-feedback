@@ -1,4 +1,5 @@
 import { getVisitorId } from "../auth/visitorId";
+import { getEventContext } from "../events/eventContext.js";
 import { EventType, PageViewTypes, Event, PageViewPayload } from "../events";
 import { EventQueue } from "../queue/eventQueue";
 import { SessionManager } from "../session/sessionManager";
@@ -10,9 +11,8 @@ export const pageViewDetector = (eventQueue : EventQueue, sessionManager: Sessio
 
   window.history.pushState = function (...args) {
     const currentUrl = window.location.href;
-
-    const targetUrl =
-      args[2] == null ? currentUrl : new URL(args[2], currentUrl).href;
+    const result = originalPushState.apply(this, args);
+    const targetUrl = window.location.href;
 
     const pageViewPayload: PageViewPayload = {
       previousUrl: currentUrl,
@@ -27,15 +27,13 @@ export const pageViewDetector = (eventQueue : EventQueue, sessionManager: Sessio
       id: crypto.randomUUID(),
       visitorId: visitorId,
       sessionId: sessionId,
+      context: getEventContext(),
       type: EventType.pageView,
       payload: pageViewPayload,
       createdAt: new Date(),
     };
 
     eventQueue.add(feedbackEvent);
-
-    const result = originalPushState.apply(this, args);
-
     previousUrl = window.location.href;
 
     return result;
@@ -57,6 +55,7 @@ export const pageViewDetector = (eventQueue : EventQueue, sessionManager: Sessio
       id: crypto.randomUUID(),
       visitorId: visitorId,
       sessionId: sessionId,
+      context: getEventContext(),
       type: EventType.pageView,
       payload: pageViewPayload,
       createdAt: new Date(),
