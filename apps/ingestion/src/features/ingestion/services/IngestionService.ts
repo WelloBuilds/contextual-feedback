@@ -3,6 +3,7 @@ import type { Event } from "../types/eventType"
 import { events as eventsTable } from "../../../models/event.model";
 import { workspaces } from "../../../models/workspace.model";
 import { workspaceOrigins } from "../../../models/workspaceOrigin.model";
+import RageClicksDetector from "../../insights/services/RageClicksDetector";
 import { eq } from "drizzle-orm";
 export default class IngestionService {
 
@@ -29,6 +30,10 @@ export default class IngestionService {
             .insert(eventsTable)
             .values(values)
             .returning();
+
+        void RageClicksDetector.detect(insertedEvents as Event[]).catch((error) => {
+            console.error("Rage click detection failed", error);
+        });
 
         return {
             message: "Events received",

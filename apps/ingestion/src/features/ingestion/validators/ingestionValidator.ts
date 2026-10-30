@@ -23,17 +23,23 @@ const clickEventSchema = eventCommonSchema.extend({
     type: z.literal(EventType.click),
 
     payload: z.object({
-        id: z.string({
-            error: "An invalid ID was entered",
-        }),
+        id: z.string().nullable().optional(),
 
-        className: z.string({
-            error: "An invalid class name was entered",
-        }),
+        className: z.string().nullable().optional(),
 
-        tagName: z.string({
-            error: "An invalid tag name was entered",
-        }),
+        tagName: z.string().nullable().optional(),
+
+        targetId: z.string().nullable().optional(),
+
+        role: z.string().nullable().optional(),
+
+        accessibleName: z.string().nullable().optional(),
+
+        fingerprint: z.string().nullable().optional(),
+
+        ignoredForRage: z.boolean().optional(),
+
+        isTrusted: z.boolean().optional(),
 
         x: z
             .number({

@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import ingestionRoutes from "./features/ingestion/routes/ingestionRoute";
+import findingsRoute from "./features/insights/routes/findingsRoute";
 
 const app = new Hono();
 
@@ -13,6 +14,7 @@ app.use(
 );
 
 app.route("/ingestion", ingestionRoutes);
+app.route("/findings", findingsRoute);
 
 
 app.notFound((c) => {

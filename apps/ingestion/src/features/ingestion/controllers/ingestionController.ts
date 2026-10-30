@@ -2,10 +2,22 @@ import IngestionService from "../services/IngestionService";
 import IngestionValidator from "../validators/ingestionValidator";
 
 export default class IngestionController {
+
+
+	// ------------------------------------------------------------
+	// MARK: Index Events 
+	// ------------------------------------------------------------
+
     public static index(c: any){
         console.log('list');
         return c.text("Ingestion route is working");
     }
+
+
+	// ------------------------------------------------------------
+	// MARK: Upload Events 
+	// ------------------------------------------------------------
+
     public static async upload(c: any) {
         const body = await c.req.json()
 
