@@ -9,6 +9,11 @@ import { EpisodeStatus } from "../enums/episodeStatus";
 import { episodes } from "../../../models/episode.model";
 
 export default class errorAfterClickDetector {
+
+	// ------------------------------------------------------------
+	// MARK: Detect
+	// ------------------------------------------------------------
+
     public static async detect(events: Event[]): Promise<void> {
         if (events.length === 0) {
             return;
@@ -49,6 +54,11 @@ export default class errorAfterClickDetector {
             );
         }
     }
+
+
+	// ------------------------------------------------------------
+	// MARK: Create Episode
+	// ------------------------------------------------------------
 
     public static async createErrorAfterClickEpisode(
         workspaceId: string,
