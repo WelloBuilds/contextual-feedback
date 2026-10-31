@@ -11,7 +11,7 @@ import {
     MIN_CLICKS,
     RAGE_WINDOW_MS,
 } from "../constants/rageClickConstants";
-import { PatternType } from "../../insights/enums/patternType";
+import { PatternType } from "../types/patternType";
 import { EpisodeStatus } from "../types/episodeType";
 import FindingsService from "../../findings/services/FindingsService";
 

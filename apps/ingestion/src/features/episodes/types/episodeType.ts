@@ -1,4 +1,4 @@
-import type { PatternType } from "../../insights/enums/patternType";
+import type { PatternType } from "./patternType";
 
 export const EpisodeStatus = {
     active: "active",

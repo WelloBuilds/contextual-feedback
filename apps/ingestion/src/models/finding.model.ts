@@ -10,7 +10,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { FindingStatus } from "../features/findings/enums/findingStatus";
 import { workspaces } from "./workspace.model";
-import type { PatternType } from "../features/insights/enums/patternType";
+import type { PatternType } from "../features/episodes/types/patternType";
 import type { PatternMetrics } from "../features/findings/types/findingType";
 
 export const findings = pgTable(

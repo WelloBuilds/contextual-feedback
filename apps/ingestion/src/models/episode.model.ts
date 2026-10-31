@@ -8,7 +8,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { workspaces } from "./workspace.model";
 import { EpisodeStatus, type EpisodeStatus as EpisodeStatusType } from "../features/episodes/types/episodeType";
-import type { PatternType } from "../features/insights/enums/patternType";
+import type { PatternType } from "../features/episodes/types/patternType";
 
 export const episodes = pgTable(
     "episodes",
