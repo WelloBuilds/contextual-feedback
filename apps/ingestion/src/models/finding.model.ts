@@ -11,7 +11,7 @@ import {
 import { FindingStatus } from "../features/insights/enums/findingStatus";
 import { workspaces } from "./workspace.model";
 import type { PatternType } from "../features/insights/enums/patternType";
-import type { PatternMetrics } from "../features/insights/types/findingType";
+import type { PatternMetrics } from "../features/findings/types/findingType";
 
 export const findings = pgTable(
     "findings",

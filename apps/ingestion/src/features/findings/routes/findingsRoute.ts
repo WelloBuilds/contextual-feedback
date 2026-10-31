@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import FindingsController from "../controllers/findingsController";
+import FindingsController from "../controllers/FindingsController";
 
 const findingsRoute = new Hono();
 

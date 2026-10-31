@@ -1,6 +1,6 @@
 import z from "zod";
 
-import { FindingStatus } from "../enums/findingStatus";
+import { FindingStatus } from "../../insights/enums/findingStatus";
 
 export default class FindingsValidator {
 	public static list() {

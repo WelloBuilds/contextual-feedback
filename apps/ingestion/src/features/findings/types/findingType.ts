@@ -1,5 +1,5 @@
-import type { FindingStatus } from "../enums/findingStatus";
-import type { PatternType } from "../enums/patternType";
+import type { FindingStatus } from "../../insights/enums/findingStatus";
+import type { PatternType } from "../../insights/enums/patternType";
 import type { RageClickMetrics } from "./rageClickMetrics";
 
 type FindingBase = {

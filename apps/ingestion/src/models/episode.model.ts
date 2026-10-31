@@ -7,7 +7,7 @@ import {
     uuid,
 } from "drizzle-orm/pg-core";
 import { workspaces } from "./workspace.model";
-import type { EpisodeStatus } from "../features/insights/types/episodeType";
+import { EpisodeStatus, type EpisodeStatus as EpisodeStatusType } from "../features/episodes/types/episodeType";
 import type { PatternType } from "../features/insights/enums/patternType";
 
 export const episodes = pgTable(
@@ -19,7 +19,7 @@ export const episodes = pgTable(
         sessionId: uuid("session_id").notNull(),
         patternType: text("pattern_type").$type<PatternType>().notNull(),
         targetKey: text("target_key"),
-        status: text("status").$type<EpisodeStatus>().notNull().default("active"),
+        status: text("status").$type<EpisodeStatusType>().notNull().default(EpisodeStatus.active),
         startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
         lastOccurredAt: timestamp("last_occurred_at", { withTimezone: true }).notNull(),
         detectedAt: timestamp("detected_at", { withTimezone: true }).notNull(),

@@ -3,6 +3,9 @@ import FindingsService from "../services/FindingsService";
 import FindingsValidator from "../validators/findingsValidator";
 
 export default class FindingsController {
+	// ------------------------------------------------------------
+	// MARK: List Findings
+	// ------------------------------------------------------------
 	public static async list(c: Context) {
 		const result = FindingsValidator.list().safeParse({
 			workspaceId: c.req.query("workspaceId"),
@@ -24,6 +27,9 @@ export default class FindingsController {
 		return c.json({ findings });
 	}
 
+	// ------------------------------------------------------------
+	// MARK: Update Finding Status
+	// ------------------------------------------------------------
 	public static async update(c: Context) {
 		const id = c.req.param("id");
 

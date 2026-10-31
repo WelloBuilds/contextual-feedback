@@ -11,8 +11,9 @@ import {
     MIN_CLICKS,
     RAGE_WINDOW_MS,
 } from "../constants/rageClickConstants";
-import { PatternType } from "../enums/patternType";
-import RageClickAggregator from "./RageClickAggregator";
+import { PatternType } from "../../insights/enums/patternType";
+import { EpisodeStatus } from "../types/episodeType";
+import FindingsService from "../../findings/services/FindingsService";
 
 type ClickRecord = typeof events.$inferSelect;
 type EpisodeRecord = typeof episodes.$inferSelect;
@@ -129,7 +130,7 @@ async function findActiveEpisode(
             eq(episodes.visitorId, visitorId),
             eq(episodes.patternType, PatternType.rageClicks),
             eq(episodes.targetKey, targetKey),
-            eq(episodes.status, "active"),
+            eq(episodes.status, EpisodeStatus.active),
         ))
         .limit(1);
 
@@ -152,9 +153,9 @@ async function recordEpisode(event: Event, targetKey: string): Promise<void> {
     if (existingEpisode && !continuesEpisode) {
         await db
             .update(episodes)
-            .set({ status: "closed", closedAt: new Date() })
+            .set({ status: EpisodeStatus.closed, closedAt: new Date() })
             .where(eq(episodes.id, existingEpisode.id));
-        await RageClickAggregator.aggregate(event.workspaceId, targetKey);
+        await FindingsService.aggregateRageClicks(event.workspaceId, targetKey);
     }
 
     const eventIds = [...new Set([
@@ -181,7 +182,7 @@ async function recordEpisode(event: Event, targetKey: string): Promise<void> {
         sessionId: lastClick.sessionId,
         patternType: PatternType.rageClicks,
         targetKey,
-        status: "active",
+        status: EpisodeStatus.active,
         startedAt: firstClick.createdAt,
         lastOccurredAt: lastClick.createdAt,
         detectedAt: new Date(event.createdAt),
@@ -201,11 +202,11 @@ async function closeStaleEpisodes(workspaceIds: string[]): Promise<void> {
     const staleBefore = new Date(now.getTime() - EPISODE_INACTIVITY_MS);
     const closedEpisodes = await db
         .update(episodes)
-        .set({ status: "closed", closedAt: now })
+        .set({ status: EpisodeStatus.closed, closedAt: now })
         .where(and(
             inArray(episodes.workspaceId, workspaceIds),
             eq(episodes.patternType, PatternType.rageClicks),
-            eq(episodes.status, "active"),
+            eq(episodes.status, EpisodeStatus.active),
             lte(episodes.lastOccurredAt, staleBefore),
         ))
         .returning();
@@ -223,7 +224,7 @@ async function closeStaleEpisodes(workspaceIds: string[]): Promise<void> {
 
     for (const [workspaceId, targetKeys] of affectedTargets) {
         for (const targetKey of targetKeys) {
-            await RageClickAggregator.aggregate(workspaceId, targetKey, now);
+            await FindingsService.aggregateRageClicks(workspaceId, targetKey, now);
         }
     }
 }
