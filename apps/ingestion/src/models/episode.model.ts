@@ -7,9 +7,9 @@ import {
     uuid,
 } from "drizzle-orm/pg-core";
 import { workspaces } from "./workspace.model";
-import { EpisodeStatus, type EpisodeStatus as EpisodeStatusType } from "../features/episodes/types/episodeType";
+import { EpisodeStatus } from "../features/episodes/enums/episodeStatus";
 import type { RageClickEpisodeMetrics } from "../features/episodes/types/episodeType";
-import type { PatternType } from "../features/episodes/types/patternType";
+import type { PatternType } from "../features/episodes/enums/patternType";
 
 export const episodes = pgTable(
     "episodes",
@@ -20,7 +20,7 @@ export const episodes = pgTable(
         sessionId: uuid("session_id").notNull(),
         patternType: text("pattern_type").$type<PatternType>().notNull(),
         targetKey: text("target_key"),
-        status: text("status").$type<EpisodeStatusType>().notNull().default(EpisodeStatus.active),
+        status: text("status").$type<EpisodeStatus>().notNull().default(EpisodeStatus.active),
         startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
         lastOccurredAt: timestamp("last_occurred_at", { withTimezone: true }).notNull(),
         detectedAt: timestamp("detected_at", { withTimezone: true }).notNull(),

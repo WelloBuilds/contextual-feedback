@@ -11,8 +11,8 @@ import {
     MIN_CLICKS,
     RAGE_WINDOW_MS,
 } from "../constants/rageClickConstants";
-import { PatternType } from "../types/patternType";
-import { EpisodeStatus } from "../types/episodeType";
+import { PatternType } from "../enums/patternType";
+import { EpisodeStatus } from "../enums/episodeStatus";
 import FindingsService from "../../findings/services/FindingsService";
 
 type ClickRecord = typeof events.$inferSelect;

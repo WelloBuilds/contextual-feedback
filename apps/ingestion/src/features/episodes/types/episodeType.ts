@@ -1,11 +1,5 @@
-import type { PatternType } from "./patternType";
-
-export const EpisodeStatus = {
-    active: "active",
-    closed: "closed",
-} as const;
-
-export type EpisodeStatus = typeof EpisodeStatus[keyof typeof EpisodeStatus];
+import type { EpisodeStatus } from "../enums/episodeStatus";
+import type { PatternType } from "../enums/patternType";
 
 export type RageClickEpisodeMetrics = {
     patternType: PatternType.rageClicks;

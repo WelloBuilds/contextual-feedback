@@ -1,5 +1,5 @@
 import type { FindingStatus } from "../enums/findingStatus";
-import type { PatternType } from "../../episodes/types/patternType";
+import type { PatternType } from "../../episodes/enums/patternType";
 import type { RageClickMetrics } from "./rageClickMetrics";
 
 type FindingBase = {
@@ -22,11 +22,11 @@ export type PatternMetrics = {
 };
 
 export type Finding = {
-    [CurrentPatternType in PatternType]: FindingBase & {
+    [CurrentPatternType in keyof PatternMetrics]: FindingBase & {
         patternType: CurrentPatternType;
         metrics: PatternMetrics[CurrentPatternType];
     };
-}[PatternType];
+}[keyof PatternMetrics];
 
 export type RageClickEvidence = {
     episodeIds: string[];

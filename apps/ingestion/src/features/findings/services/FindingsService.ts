@@ -5,8 +5,8 @@ import { episodes } from "../../../models/episode.model";
 import { findings } from "../../../models/finding.model";
 import EventContextValidator from "../../ingestion/validators/eventContextValidator";
 import { FindingStatus } from "../enums/findingStatus";
-import { PatternType } from "../../episodes/types/patternType";
-import { EpisodeStatus } from "../../episodes/types/episodeType";
+import { PatternType } from "../../episodes/enums/patternType";
+import { EpisodeStatus } from "../../episodes/enums/episodeStatus";
 import {
 	AGGREGATION_WINDOW_MS,
 	MIN_DISTINCT_VISITORS,
