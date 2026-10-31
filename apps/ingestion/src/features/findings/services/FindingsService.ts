@@ -19,7 +19,7 @@ type EpisodeRecord = typeof episodes.$inferSelect;
 const eventContextSchema = EventContextValidator.context();
 
 function getClickCount(episode: EpisodeRecord): number {
-	return typeof episode.metrics.clickCount === "number" ? episode.metrics.clickCount : 0;
+	return episode.metrics.patternType === PatternType.rageClicks ? episode.metrics.clickCount : 0;
 }
 
 function buildRageClickMetrics(episodes: EpisodeRecord[]): RageClickMetrics {

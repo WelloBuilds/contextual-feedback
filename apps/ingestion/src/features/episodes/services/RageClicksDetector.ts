@@ -167,7 +167,10 @@ async function recordEpisode(event: Event, targetKey: string): Promise<void> {
         await db
             .update(episodes)
             .set({
-                metrics: { clickCount: eventIds.length },
+                metrics: {
+                    patternType: PatternType.rageClicks,
+                    clickCount: eventIds.length,
+                },
                 lastOccurredAt: lastClick.createdAt,
                 eventIds,
             })
@@ -187,8 +190,10 @@ async function recordEpisode(event: Event, targetKey: string): Promise<void> {
         lastOccurredAt: lastClick.createdAt,
         detectedAt: new Date(event.createdAt),
         closedAt: null,
-        metrics: { clickCount: eventIds.length },
-        evidence: {},
+        metrics: {
+            patternType: PatternType.rageClicks,
+            clickCount: eventIds.length,
+        },
         eventIds,
     });
 }

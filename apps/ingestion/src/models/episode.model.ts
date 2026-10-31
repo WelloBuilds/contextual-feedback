@@ -8,6 +8,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { workspaces } from "./workspace.model";
 import { EpisodeStatus, type EpisodeStatus as EpisodeStatusType } from "../features/episodes/types/episodeType";
+import type { RageClickEpisodeMetrics } from "../features/episodes/types/episodeType";
 import type { PatternType } from "../features/episodes/types/patternType";
 
 export const episodes = pgTable(
@@ -24,8 +25,7 @@ export const episodes = pgTable(
         lastOccurredAt: timestamp("last_occurred_at", { withTimezone: true }).notNull(),
         detectedAt: timestamp("detected_at", { withTimezone: true }).notNull(),
         closedAt: timestamp("closed_at", { withTimezone: true }),
-        metrics: jsonb("metrics").$type<Record<string, unknown>>().notNull().default({}),
-        evidence: jsonb("evidence").$type<Record<string, unknown>>().notNull().default({}),
+        metrics: jsonb("metrics").$type<RageClickEpisodeMetrics>().notNull(),
         eventIds: jsonb("event_ids").$type<string[]>().notNull().default([]),
         createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     },
