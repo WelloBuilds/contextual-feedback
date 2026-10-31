@@ -3,36 +3,33 @@ import type { PatternType } from "../../episodes/enums/patternType";
 import type { RageClickMetrics } from "./rageClickMetrics";
 
 type FindingBase = {
-    id: string;
-    workspaceId: string;
-    targetKey: string | null;
-    evidence: Record<string, unknown>;
-    affectedVisitorCount: number;
-    affectedSessionCount: number;
-    episodeCount: number;
-    confidence: string;
-    status: FindingStatus;
-    firstSeenAt: Date;
-    lastSeenAt: Date;
-    createdAt: Date;
+	id: string;
+	workspaceId: string;
+	patternType: PatternType;
+	affectedVisitorCount: number;
+	affectedSessionCount: number;
+	episodeCount: number;
+	confidence: string;
+	status: FindingStatus;
+	firstSeenAt: Date;
+	lastSeenAt: Date;
+	createdAt: Date;
 };
 
-export type PatternMetrics = {
-    [PatternType.rageClicks]: RageClickMetrics;
-};
-
-export type Finding = {
-    [CurrentPatternType in keyof PatternMetrics]: FindingBase & {
-        patternType: CurrentPatternType;
-        metrics: PatternMetrics[CurrentPatternType];
-    };
-}[keyof PatternMetrics];
+export type Finding = FindingBase & (
+	| {
+		patternType: PatternType.rageClicks;
+		targetKey: string;
+		metrics: RageClickMetrics;
+		evidence: RageClickEvidence;
+	}
+);
 
 export type RageClickEvidence = {
-    episodeIds: string[];
-    visitorIds: string[];
-    affectedPages: Array<{
-        id: string | null;
-        path: string;
-    }>;
+	episodeIds: string[];
+	visitorIds: string[];
+	affectedPages: Array<{
+		id: string | null;
+		path: string;
+	}>;
 };

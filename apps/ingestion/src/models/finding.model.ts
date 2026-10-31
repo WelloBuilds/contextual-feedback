@@ -9,9 +9,9 @@ import {
     uuid,
 } from "drizzle-orm/pg-core";
 import { FindingStatus } from "../features/findings/enums/findingStatus";
-import { workspaces } from "./workspace.model";
 import type { PatternType } from "../features/episodes/enums/patternType";
-import type { PatternMetrics } from "../features/findings/types/findingType";
+import { workspaces } from "./workspace.model";
+import type { Finding } from "../features/findings/types/findingType";
 
 export const findings = pgTable(
     "findings",
@@ -20,11 +20,11 @@ export const findings = pgTable(
         workspaceId: uuid("workspace_id").references(() => workspaces.id).notNull(),
         patternType: text("pattern_type").$type<PatternType>().notNull(),
         targetKey: text("target_key"),
-        evidence: jsonb("evidence").notNull().default({}),
+        evidence: jsonb("evidence").$type<Finding["evidence"]>().notNull(),
         affectedVisitorCount: integer("affected_visitor_count").notNull(),
         affectedSessionCount: integer("affected_session_count").notNull(),
         episodeCount: integer("episode_count").notNull(),
-        metrics: jsonb("metrics").$type<PatternMetrics[keyof PatternMetrics]>().notNull(),
+        metrics: jsonb("metrics").$type<Finding["metrics"]>().notNull(),
         confidence: numeric("confidence", { precision: 3, scale: 2 }).notNull(),
         status: text("status").$type<FindingStatus>().notNull().default(FindingStatus.candidate),
         firstSeenAt: timestamp("first_seen_at", { withTimezone: true }).notNull(),
