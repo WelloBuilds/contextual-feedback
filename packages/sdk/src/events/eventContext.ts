@@ -2,7 +2,6 @@ export type EventContext = {
   page: {
     id: string | null;
     path: string;
-    url: string;
   };
 };
 
@@ -14,7 +13,6 @@ export function getEventContext(): EventContext {
     page: {
       id: pageId || null,
       path,
-      url: `${window.location.origin}${path}`,
     },
   };
 }

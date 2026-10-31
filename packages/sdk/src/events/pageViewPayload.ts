@@ -1,6 +1,6 @@
 export type PageViewPayload = {
-  previousUrl: string;
-  targetUrl: string;
+  previousPath: string;
+  targetPath: string;
   type: PageViewTypes | undefined | null;
 };
 

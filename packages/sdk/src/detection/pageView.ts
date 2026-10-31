@@ -5,18 +5,18 @@ import { EventQueue } from "../queue/eventQueue";
 import { SessionManager } from "../session/sessionManager";
 
 export const pageViewDetector = (eventQueue : EventQueue, sessionManager: SessionManager) => {
-  let previousUrl = window.location.href;
+  let previousPath = window.location.pathname;
 
   const originalPushState = window.history.pushState;
 
   window.history.pushState = function (...args) {
-    const currentUrl = window.location.href;
+    const currentPath = window.location.pathname;
     const result = originalPushState.apply(this, args);
-    const targetUrl = window.location.href;
+    const targetPath = window.location.pathname;
 
     const pageViewPayload: PageViewPayload = {
-      previousUrl: currentUrl,
-      targetUrl,
+      previousPath: currentPath,
+      targetPath,
       type: PageViewTypes.pushState,
     };
 
@@ -34,17 +34,17 @@ export const pageViewDetector = (eventQueue : EventQueue, sessionManager: Sessio
     };
 
     eventQueue.add(feedbackEvent);
-    previousUrl = window.location.href;
+    previousPath = targetPath;
 
     return result;
   };
 
   window.addEventListener("popstate", () => {
-    const targetUrl = window.location.href;
+    const targetPath = window.location.pathname;
 
     const pageViewPayload: PageViewPayload = {
-      previousUrl,
-      targetUrl,
+      previousPath,
+      targetPath,
       type: PageViewTypes.popState,
     };
 
@@ -63,6 +63,6 @@ export const pageViewDetector = (eventQueue : EventQueue, sessionManager: Sessio
 
     eventQueue.add(feedbackEvent);
 
-    previousUrl = targetUrl;
+    previousPath = targetPath;
   });
 };

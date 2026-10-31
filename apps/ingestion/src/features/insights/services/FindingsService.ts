@@ -1,15 +1,15 @@
 import { db } from "../../../db";
 import { findings } from "../../../models/finding.model";
-import { FindingStatus } from "../enums/findingStatus";
-import { eq, and } from "drizzle-orm";
+import type { FindingStatus } from "../enums/findingStatus";
+import { eq, and, type SQL } from "drizzle-orm";
 
 export default class FindingsService {
 
 	// ------------------------------------------------------------
 	// MARK: List Findings
 	// ------------------------------------------------------------
-	public static async list(workspaceId: string, status?: string) {
-		const conditions = [eq(findings.workspaceId, workspaceId)];
+	public static async list(workspaceId: string, status?: FindingStatus) {
+		const conditions: SQL[] = [eq(findings.workspaceId, workspaceId)];
 
 		if (status) {
 			conditions.push(eq(findings.status, status));

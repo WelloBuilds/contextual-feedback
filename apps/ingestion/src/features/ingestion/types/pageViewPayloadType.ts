@@ -1,7 +1,7 @@
 import { PageViewTypes } from "../enums/pageViewType";
 
 export type PageViewPayload = {
-    previousUrl: string;
-    targetUrl: string;
+    previousPath: string;
+    targetPath: string;
     type?: PageViewTypes | null;
 }

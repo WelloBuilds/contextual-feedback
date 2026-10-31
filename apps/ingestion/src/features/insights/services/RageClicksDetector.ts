@@ -1,7 +1,7 @@
 import { and, eq, gte, inArray, lte } from "drizzle-orm";
 import { db } from "../../../db";
 import { events } from "../../../models/event.model";
-import { rageClickEpisodes } from "../../../models/rageClickEpisode.model";
+import { episodes } from "../../../models/episode.model";
 import type { ClickPayload } from "../../ingestion/types/clickPayloadType";
 import type { Event } from "../../ingestion/types/eventType";
 import {
@@ -11,10 +11,11 @@ import {
     MIN_CLICKS,
     RAGE_WINDOW_MS,
 } from "../constants/rageClickConstants";
+import { PatternType } from "../enums/patternType";
 import RageClickAggregator from "./RageClickAggregator";
 
 type ClickRecord = typeof events.$inferSelect;
-type EpisodeRecord = typeof rageClickEpisodes.$inferSelect;
+type EpisodeRecord = typeof episodes.$inferSelect;
 
 const GENERATED_CLASS_PATTERN = /\d{4,}|^[a-f0-9]{8,}$/i;
 const CSS_IN_JS_CLASS_PATTERN = /^css-|^sc-/i;
@@ -122,12 +123,13 @@ async function findActiveEpisode(
 ): Promise<EpisodeRecord | undefined> {
     const [episode] = await db
         .select()
-        .from(rageClickEpisodes)
+        .from(episodes)
         .where(and(
-            eq(rageClickEpisodes.workspaceId, workspaceId),
-            eq(rageClickEpisodes.visitorId, visitorId),
-            eq(rageClickEpisodes.targetKey, targetKey),
-            eq(rageClickEpisodes.status, "active"),
+            eq(episodes.workspaceId, workspaceId),
+            eq(episodes.visitorId, visitorId),
+            eq(episodes.patternType, PatternType.rageClicks),
+            eq(episodes.targetKey, targetKey),
+            eq(episodes.status, "active"),
         ))
         .limit(1);
 
@@ -144,14 +146,15 @@ async function recordEpisode(event: Event, targetKey: string): Promise<void> {
     const lastClick = clicks[clicks.length - 1];
     const existingEpisode = await findActiveEpisode(event.workspaceId, event.visitorId, targetKey);
     const continuesEpisode = existingEpisode &&
-        lastClick.createdAt.getTime() - existingEpisode.lastClickAt.getTime() <= EPISODE_INACTIVITY_MS &&
+        lastClick.createdAt.getTime() - existingEpisode.lastOccurredAt.getTime() <= EPISODE_INACTIVITY_MS &&
         lastClick.createdAt.getTime() - existingEpisode.startedAt.getTime() <= MAX_EPISODE_DURATION_MS;
 
     if (existingEpisode && !continuesEpisode) {
         await db
-            .update(rageClickEpisodes)
-            .set({ status: "closed" })
-            .where(eq(rageClickEpisodes.id, existingEpisode.id));
+            .update(episodes)
+            .set({ status: "closed", closedAt: new Date() })
+            .where(eq(episodes.id, existingEpisode.id));
+        await RageClickAggregator.aggregate(event.workspaceId, targetKey);
     }
 
     const eventIds = [...new Set([
@@ -161,29 +164,30 @@ async function recordEpisode(event: Event, targetKey: string): Promise<void> {
 
     if (continuesEpisode) {
         await db
-            .update(rageClickEpisodes)
+            .update(episodes)
             .set({
-                clickCount: eventIds.length,
-                endedAt: lastClick.createdAt,
-                lastClickAt: lastClick.createdAt,
+                metrics: { clickCount: eventIds.length },
+                lastOccurredAt: lastClick.createdAt,
                 eventIds,
             })
-            .where(eq(rageClickEpisodes.id, existingEpisode.id));
+            .where(eq(episodes.id, existingEpisode.id));
         return;
     }
 
-    await db.insert(rageClickEpisodes).values({
+    await db.insert(episodes).values({
         id: crypto.randomUUID(),
         workspaceId: event.workspaceId,
         visitorId: event.visitorId,
         sessionId: lastClick.sessionId,
+        patternType: PatternType.rageClicks,
         targetKey,
-        clickCount: eventIds.length,
-        startedAt: firstClick.createdAt,
-        endedAt: lastClick.createdAt,
-        lastClickAt: lastClick.createdAt,
-        detectedAt: new Date(event.createdAt),
         status: "active",
+        startedAt: firstClick.createdAt,
+        lastOccurredAt: lastClick.createdAt,
+        detectedAt: new Date(event.createdAt),
+        closedAt: null,
+        metrics: { clickCount: eventIds.length },
+        evidence: {},
         eventIds,
     });
 }
@@ -196,17 +200,22 @@ async function closeStaleEpisodes(workspaceIds: string[]): Promise<void> {
     const now = new Date();
     const staleBefore = new Date(now.getTime() - EPISODE_INACTIVITY_MS);
     const closedEpisodes = await db
-        .update(rageClickEpisodes)
-        .set({ status: "closed" })
+        .update(episodes)
+        .set({ status: "closed", closedAt: now })
         .where(and(
-            inArray(rageClickEpisodes.workspaceId, workspaceIds),
-            eq(rageClickEpisodes.status, "active"),
-            lte(rageClickEpisodes.lastClickAt, staleBefore),
+            inArray(episodes.workspaceId, workspaceIds),
+            eq(episodes.patternType, PatternType.rageClicks),
+            eq(episodes.status, "active"),
+            lte(episodes.lastOccurredAt, staleBefore),
         ))
         .returning();
 
     const affectedTargets = new Map<string, Set<string>>();
     for (const { workspaceId, targetKey } of closedEpisodes) {
+        if (!targetKey) {
+            continue;
+        }
+
         const targetKeys = affectedTargets.get(workspaceId) ?? new Set<string>();
         targetKeys.add(targetKey);
         affectedTargets.set(workspaceId, targetKeys);

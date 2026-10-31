@@ -3,6 +3,7 @@ import z from "zod";
 import { EventType } from "../enums/eventType";
 import { ErrorTypes } from "../enums/errorType";
 import { PageViewTypes } from "../enums/pageViewType";
+import EventContextValidator from "./eventContextValidator";
 
 const eventCommonSchema = z.object({
     id: z.uuid({
@@ -17,13 +18,7 @@ const eventCommonSchema = z.object({
     createdAt: z.coerce.date({
         error: "An invalid created at date was entered",
     }),
-    context: z.object({
-        page: z.object({
-            id: z.string().max(200).nullable(),
-            path: z.string().max(2048),
-            url: z.url().max(4096),
-        }),
-    }).optional(),
+    context: EventContextValidator.context().optional(),
 });
 
 const clickEventSchema = eventCommonSchema.extend({
@@ -120,13 +115,9 @@ const pageViewSchema = eventCommonSchema.extend({
     type: z.literal(EventType.pageView),
 
     payload: z.object({
-        previousUrl: z.url({
-            error: "An invalid previous URL was entered",
-        }),
+        previousPath: z.string().max(2048),
 
-        targetUrl: z.url({
-            error: "An invalid target URL was entered",
-        }),
+        targetPath: z.string().max(2048),
 
         type: z.enum(PageViewTypes).nullish(),
     }),

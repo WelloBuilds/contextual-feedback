@@ -9,7 +9,6 @@ export type EventContext = {
     page: {
         id: string | null;
         path: string;
-        url: string;
     };
 };
 

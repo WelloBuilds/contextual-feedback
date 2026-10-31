@@ -1,3 +1,3 @@
 export enum PatternType {
-	rageClicks = "rage_clicks",
+    rageClicks = "rage_clicks",
 }
