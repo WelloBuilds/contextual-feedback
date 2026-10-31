@@ -18,11 +18,13 @@ import type { Episode } from "../../episodes/types/episodeType";
 
 const eventContextSchema = EventContextValidator.context();
 
-function getClickCount(episode: Episode): number {
-	return episode.patternType === PatternType.rageClicks ? episode.metrics.clickCount : 0;
+function getClickCount(episode: Extract<Episode, { patternType: PatternType.rageClicks }>): number {
+	return episode.metrics.clickCount;
 }
 
-function buildRageClickMetrics(episodes: Episode[]): RageClickMetrics {
+function buildRageClickMetrics(
+	episodes: Array<Extract<Episode, { patternType: PatternType.rageClicks }>>,
+): RageClickMetrics {
 	const totalClickCount = episodes.reduce((total, episode) => total + getClickCount(episode), 0);
 	const averageClicksPerSecond = episodes.reduce((total, episode) => {
 		const durationSeconds = Math.max(
@@ -35,7 +37,9 @@ function buildRageClickMetrics(episodes: Episode[]): RageClickMetrics {
 	return { totalClickCount, averageClicksPerSecond: Number(averageClicksPerSecond.toFixed(2)) };
 }
 
-async function buildRageClickEvidence(episodes: Episode[]): Promise<RageClickEvidence> {
+async function buildRageClickEvidence(
+	episodes: Array<Extract<Episode, { patternType: PatternType.rageClicks }>>,
+): Promise<RageClickEvidence> {
 	const eventIds = [...new Set(episodes.flatMap((episode) => episode.eventIds))];
 	const clickEvents = eventIds.length
 		? await db.select({ context: events.context }).from(events).where(inArray(events.id, eventIds))
@@ -95,7 +99,9 @@ export default class FindingsService {
 			gte(episodes.startedAt, windowStart),
 			lte(episodes.startedAt, aggregationTime),
 		));
-		const matchingEpisodes = episodeRecords as Episode[];
+		const matchingEpisodes = episodeRecords as Array<
+			Extract<Episode, { patternType: PatternType.rageClicks }>
+		>;
 
 		const visitorIds = new Set(matchingEpisodes.map((episode) => episode.visitorId));
 		if (matchingEpisodes.length < MIN_EPISODES || visitorIds.size < MIN_DISTINCT_VISITORS) return;

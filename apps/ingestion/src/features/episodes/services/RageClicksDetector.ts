@@ -122,7 +122,7 @@ async function findActiveEpisode(
     workspaceId: string,
     visitorId: string,
     targetKey: string,
-): Promise<Episode | undefined> {
+): Promise<Extract<Episode, { patternType: PatternType.rageClicks }> | undefined> {
     const [episode] = await db
         .select()
         .from(episodes)
@@ -137,7 +137,7 @@ async function findActiveEpisode(
         ))
         .limit(1);
 
-    return episode as Episode | undefined;
+    return episode as Extract<Episode, { patternType: PatternType.rageClicks }> | undefined;
 }
 
 async function recordEpisode(event: Event, targetKey: string): Promise<void> {
