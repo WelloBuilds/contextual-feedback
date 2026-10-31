@@ -19,7 +19,7 @@ import type { Episode } from "../../episodes/types/episodeType";
 const eventContextSchema = EventContextValidator.context();
 
 function getClickCount(episode: Episode): number {
-	return episode.metrics.clickCount;
+	return episode.patternType === PatternType.rageClicks ? episode.metrics.clickCount : 0;
 }
 
 function buildRageClickMetrics(episodes: Episode[]): RageClickMetrics {
