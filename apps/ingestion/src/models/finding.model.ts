@@ -8,7 +8,7 @@ import {
     uniqueIndex,
     uuid,
 } from "drizzle-orm/pg-core";
-import { FindingStatus } from "../features/insights/enums/findingStatus";
+import { FindingStatus } from "../features/findings/enums/findingStatus";
 import { workspaces } from "./workspace.model";
 import type { PatternType } from "../features/insights/enums/patternType";
 import type { PatternMetrics } from "../features/findings/types/findingType";

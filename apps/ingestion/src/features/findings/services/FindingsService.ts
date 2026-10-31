@@ -4,7 +4,7 @@ import { events } from "../../../models/event.model";
 import { episodes } from "../../../models/episode.model";
 import { findings } from "../../../models/finding.model";
 import EventContextValidator from "../../ingestion/validators/eventContextValidator";
-import { FindingStatus } from "../../insights/enums/findingStatus";
+import { FindingStatus } from "../enums/findingStatus";
 import { PatternType } from "../../insights/enums/patternType";
 import { EpisodeStatus } from "../../episodes/types/episodeType";
 import {
