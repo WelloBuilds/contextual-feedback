@@ -1,4 +1,4 @@
-import { and, eq, lte, sql } from "drizzle-orm";
+import { and, eq, gte, lte, sql } from "drizzle-orm";
 import { db } from "../../../db";
 import { EventType } from "../../ingestion/enums/eventType";
 import type { Event } from "../../ingestion/types/eventType";
@@ -23,17 +23,18 @@ export default class errorAfterClickDetector {
         const errorEvents = events.filter((event) => event.type === EventType.error);
 
         for (const errorEvent of errorEvents) {
-            const existingError = await db
+            const existingEpisode = await db
                 .select()
                 .from(episodes)
                 .where(and(
                     eq(episodes.visitorId, errorEvent.visitorId),
                     eq(episodes.workspaceId, workspaceId),
+                    eq(episodes.patternType, PatternType.errorAfterClick),
                     sql`${episodes.eventIds} ? ${errorEvent.id}`
                 ))
 
-            if(existingError.length > 0)
-                return
+            if(existingEpisode.length > 0)
+                continue
 
             const clickEvents = await db
                 .select()
@@ -42,12 +43,23 @@ export default class errorAfterClickDetector {
                     eq(eventsTable.visitorId, errorEvent.visitorId),
                     eq(eventsTable.workspaceId, workspaceId),
                     eq(eventsTable.type, EventType.click),
-                    lte(
-                        eventsTable.createdAt,
-                        new Date(errorEvent.createdAt.getTime() - CLICK_ERROR_WINDOW_MS),
+                    and(
+                        gte(
+                            eventsTable.createdAt,
+                            new Date(errorEvent.createdAt.getTime() - CLICK_ERROR_WINDOW_MS),
+                        ),
+                        lte(
+                            eventsTable.createdAt,
+                            new Date(errorEvent.createdAt.getTime()),
+                        )
+
                     ),
                 ));
-            this.createErrorAfterClickEpisode(
+
+            if(clickEvents.length == 0)
+                continue
+
+            await this.createErrorAfterClickEpisode(
                 workspaceId,
                 errorEvent,
                 clickEvents.map((event) => event.id),

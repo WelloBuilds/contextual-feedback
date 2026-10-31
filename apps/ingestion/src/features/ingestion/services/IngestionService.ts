@@ -5,6 +5,7 @@ import { workspaces } from "../../../models/workspace.model";
 import { workspaceOrigins } from "../../../models/workspaceOrigin.model";
 import RageClicksDetector from "../../episodes/services/RageClicksDetector";
 import { eq } from "drizzle-orm";
+import errorAfterClickDetector from "../../episodes/services/ErrorAfterClickDetector";
 export default class IngestionService {
 
 	// ------------------------------------------------------------
@@ -34,6 +35,10 @@ export default class IngestionService {
 
         void RageClicksDetector.detect(insertedEvents as Event[]).catch((error) => {
             console.error("Rage click detection failed", error);
+        });
+
+        void errorAfterClickDetector.detect(insertedEvents as Event[]).catch((error) => {
+            console.error("Error after click detection failed", error);
         });
 
         return {

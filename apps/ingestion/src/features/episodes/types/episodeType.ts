@@ -24,11 +24,4 @@ export type Episode = EpisodeBase & (
 		closedAt: Date | null;
 		metrics: RageClickEpisodeMetric;
 	}
-	| {
-		patternType: PatternType.errorAfterClick;
-		targetKey: string;
-		startedAt: Date;
-		lastOccurredAt: Date;
-		closedAt: Date | null;
-	}
 );
