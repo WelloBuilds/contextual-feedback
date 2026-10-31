@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, inArray, lte, type SQL } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, isNotNull, lte, type SQL } from "drizzle-orm";
 import { db } from "../../../db";
 import { events } from "../../../models/event.model";
 import { episodes } from "../../../models/episode.model";
@@ -14,15 +14,15 @@ import {
 } from "../constants/rageClickFindingConstants";
 import type { RageClickEvidence } from "../types/findingType";
 import type { RageClickMetrics } from "../types/rageClickMetrics";
+import type { Episode } from "../../episodes/types/episodeType";
 
-type EpisodeRecord = typeof episodes.$inferSelect;
 const eventContextSchema = EventContextValidator.context();
 
-function getClickCount(episode: EpisodeRecord): number {
-	return episode.metrics.patternType === PatternType.rageClicks ? episode.metrics.clickCount : 0;
+function getClickCount(episode: Episode): number {
+	return episode.metrics.clickCount;
 }
 
-function buildRageClickMetrics(episodes: EpisodeRecord[]): RageClickMetrics {
+function buildRageClickMetrics(episodes: Episode[]): RageClickMetrics {
 	const totalClickCount = episodes.reduce((total, episode) => total + getClickCount(episode), 0);
 	const averageClicksPerSecond = episodes.reduce((total, episode) => {
 		const durationSeconds = Math.max(
@@ -35,7 +35,7 @@ function buildRageClickMetrics(episodes: EpisodeRecord[]): RageClickMetrics {
 	return { totalClickCount, averageClicksPerSecond: Number(averageClicksPerSecond.toFixed(2)) };
 }
 
-async function buildRageClickEvidence(episodes: EpisodeRecord[]): Promise<RageClickEvidence> {
+async function buildRageClickEvidence(episodes: Episode[]): Promise<RageClickEvidence> {
 	const eventIds = [...new Set(episodes.flatMap((episode) => episode.eventIds))];
 	const clickEvents = eventIds.length
 		? await db.select({ context: events.context }).from(events).where(inArray(events.id, eventIds))
@@ -85,14 +85,17 @@ export default class FindingsService {
 		aggregationTime = new Date(),
 	): Promise<void> {
 		const windowStart = new Date(aggregationTime.getTime() - AGGREGATION_WINDOW_MS);
-		const matchingEpisodes = await db.select().from(episodes).where(and(
+		const episodeRecords = await db.select().from(episodes).where(and(
 			eq(episodes.workspaceId, workspaceId),
 			eq(episodes.patternType, PatternType.rageClicks),
 			eq(episodes.targetKey, targetKey),
 			eq(episodes.status, EpisodeStatus.closed),
+			isNotNull(episodes.startedAt),
+			isNotNull(episodes.lastOccurredAt),
 			gte(episodes.startedAt, windowStart),
 			lte(episodes.startedAt, aggregationTime),
 		));
+		const matchingEpisodes = episodeRecords as Episode[];
 
 		const visitorIds = new Set(matchingEpisodes.map((episode) => episode.visitorId));
 		if (matchingEpisodes.length < MIN_EPISODES || visitorIds.size < MIN_DISTINCT_VISITORS) return;

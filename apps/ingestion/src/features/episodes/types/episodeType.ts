@@ -1,29 +1,27 @@
 import type { EpisodeStatus } from "../enums/episodeStatus";
 import type { PatternType } from "../enums/patternType";
-
-export type RageClickEpisodeMetrics = {
-    patternType: PatternType.rageClicks;
-    clickCount: number;
-};
+import type { RageClickEpisodeMetric } from "./rageClickEpisodeMetric";
 
 type EpisodeBase = {
-    id: string;
-    workspaceId: string;
-    visitorId: string;
-    sessionId: string;
-    status: EpisodeStatus;
-    startedAt: Date;
-    lastOccurredAt: Date;
-    detectedAt: Date;
-    closedAt: Date | null;
-    eventIds: string[];
-    createdAt: Date;
+	id: string;
+	workspaceId: string;
+	visitorId: string;
+	sessionId: string;
+	patternType: PatternType;
+	status: EpisodeStatus;
+	detectedAt: Date;
+	deletedAt: Date | null;
+	eventIds: string[];
+	createdAt: Date;
 };
 
-export type RageClickEpisode = EpisodeBase & {
-    patternType: PatternType.rageClicks;
-    targetKey: string;
-    metrics: RageClickEpisodeMetrics;
-};
-
-export type Episode = RageClickEpisode;
+export type Episode = EpisodeBase & (
+	| {
+		patternType: PatternType.rageClicks;
+		targetKey: string;
+		startedAt: Date;
+		lastOccurredAt: Date;
+		closedAt: Date | null;
+		metrics: RageClickEpisodeMetric;
+	}
+);

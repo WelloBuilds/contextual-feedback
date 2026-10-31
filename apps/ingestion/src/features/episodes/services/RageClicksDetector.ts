@@ -1,4 +1,4 @@
-import { and, eq, gte, inArray, lte } from "drizzle-orm";
+import { and, eq, gte, inArray, isNotNull, lte } from "drizzle-orm";
 import { db } from "../../../db";
 import { events } from "../../../models/event.model";
 import { episodes } from "../../../models/episode.model";
@@ -14,9 +14,10 @@ import {
 import { PatternType } from "../enums/patternType";
 import { EpisodeStatus } from "../enums/episodeStatus";
 import FindingsService from "../../findings/services/FindingsService";
+import type { Episode } from "../types/episodeType";
+import EpisodesValidator from "../validators/episodesValidator";
 
 type ClickRecord = typeof events.$inferSelect;
-type EpisodeRecord = typeof episodes.$inferSelect;
 
 const GENERATED_CLASS_PATTERN = /\d{4,}|^[a-f0-9]{8,}$/i;
 const CSS_IN_JS_CLASS_PATTERN = /^css-|^sc-/i;
@@ -121,7 +122,7 @@ async function findActiveEpisode(
     workspaceId: string,
     visitorId: string,
     targetKey: string,
-): Promise<EpisodeRecord | undefined> {
+): Promise<Episode | undefined> {
     const [episode] = await db
         .select()
         .from(episodes)
@@ -131,10 +132,12 @@ async function findActiveEpisode(
             eq(episodes.patternType, PatternType.rageClicks),
             eq(episodes.targetKey, targetKey),
             eq(episodes.status, EpisodeStatus.active),
+            isNotNull(episodes.startedAt),
+            isNotNull(episodes.lastOccurredAt),
         ))
         .limit(1);
 
-    return episode;
+    return episode as Episode | undefined;
 }
 
 async function recordEpisode(event: Event, targetKey: string): Promise<void> {
@@ -178,7 +181,7 @@ async function recordEpisode(event: Event, targetKey: string): Promise<void> {
         return;
     }
 
-    await db.insert(episodes).values({
+    const episode = EpisodesValidator.create().parse({
         id: crypto.randomUUID(),
         workspaceId: event.workspaceId,
         visitorId: event.visitorId,
@@ -196,6 +199,8 @@ async function recordEpisode(event: Event, targetKey: string): Promise<void> {
         },
         eventIds,
     });
+
+    await db.insert(episodes).values(episode);
 }
 
 async function closeStaleEpisodes(workspaceIds: string[]): Promise<void> {
