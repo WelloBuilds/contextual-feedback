@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, inArray, isNotNull, lte, type SQL } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, isNotNull, lte, sql, type SQL } from "drizzle-orm";
 import { db } from "../../../db";
 import { events } from "../../../models/event.model";
 import { episodes } from "../../../models/episode.model";
@@ -151,4 +151,32 @@ export default class FindingsService {
 			lastSeenAt,
 		}).onConflictDoNothing();
 	}
+
+	// ------------------------------------------------------------
+	// MARK: Create Error After Click Finding
+	// ------------------------------------------------------------
+
+	public static async CreateErrorAfterClickFinding(
+		workspaceId: string,
+		episode: Extract<Episode, { patternType: PatternType.errorAfterClick }>,
+	) {
+
+		const samePageEpisodes = await db
+			.select()
+			.from(episodes)
+			.where(and(
+				eq(episodes.workspaceId, workspaceId),
+				eq(episodes.patternType, PatternType.errorAfterClick),
+				eq(episodes.errorMessage, episode.errorMessage),
+				sql`${episodes.context}->'page'->>'path' = ${episode.context.page.path}`,
+			));
+		const uniqueVisitorIds = new Set(
+			samePageEpisodes.map((previousEpisode) => previousEpisode.visitorId)
+		);
+
+		if(uniqueVisitorIds.size < 3)
+			return
+
+	}
+
 }

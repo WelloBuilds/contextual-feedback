@@ -1,6 +1,7 @@
 import type { EpisodeStatus } from "../enums/episodeStatus";
 import type { PatternType } from "../enums/patternType";
 import type { RageClickEpisodeMetric } from "./rageClickEpisodeMetric";
+import type { EventContext } from "../../ingestion/types/eventType";
 
 type EpisodeBase = {
 	id: string;
@@ -26,5 +27,7 @@ export type Episode = EpisodeBase & (
 	}
 	| {
 		patternType: PatternType.errorAfterClick;
+		errorMessage: string;
+		context: EventContext;
 	}
 );

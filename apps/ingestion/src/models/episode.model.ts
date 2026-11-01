@@ -8,8 +8,8 @@ import {
 } from "drizzle-orm/pg-core";
 import { workspaces } from "./workspace.model";
 import { EpisodeStatus } from "../features/episodes/enums/episodeStatus";
-import type { Episode } from "../features/episodes/types/episodeType";
 import type { PatternType } from "../features/episodes/enums/patternType";
+import type { EventContext } from "../features/ingestion/types/eventType";
 
 export const episodes = pgTable(
     "episodes",
@@ -21,6 +21,8 @@ export const episodes = pgTable(
         patternType: text("pattern_type").$type<PatternType>().notNull(),
         targetKey: text("target_key"),
         status: text("status").$type<EpisodeStatus>().notNull().default(EpisodeStatus.active),
+        errorMessage: text("error_message"),
+        context: jsonb("context").$type<EventContext | null>(),
         startedAt: timestamp("started_at", { withTimezone: true }),
         lastOccurredAt: timestamp("last_occurred_at", { withTimezone: true }),
         detectedAt: timestamp("detected_at", { withTimezone: true }).notNull(),

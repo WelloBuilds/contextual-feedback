@@ -1,12 +1,13 @@
 import { and, eq, gte, lte, sql } from "drizzle-orm";
 import { db } from "../../../db";
 import { EventType } from "../../ingestion/enums/eventType";
-import type { Event } from "../../ingestion/types/eventType";
+import type { Event, EventContext } from "../../ingestion/types/eventType";
 import { events as eventsTable } from "../../../models/event.model";
 import { CLICK_ERROR_WINDOW_MS } from "../constants/errorAfterClickConstants";
 import { PatternType } from "../enums/patternType";
 import { EpisodeStatus } from "../enums/episodeStatus";
 import { episodes } from "../../../models/episode.model";
+import EventContextValidator from "../../ingestion/validators/eventContextValidator";
 
 export default class errorAfterClickDetector {
 
@@ -20,9 +21,14 @@ export default class errorAfterClickDetector {
         }
 
         const workspaceId = events[0].workspaceId;
-        const errorEvents = events.filter((event) => event.type === EventType.error);
+        const errorEvents = events.filter(
+            (event): event is Extract<Event, { type: EventType.error }> => event.type === EventType.error,
+        );
 
         for (const errorEvent of errorEvents) {
+            const errorContext = EventContextValidator.context().safeParse(errorEvent.context);
+            if (!errorContext.success) continue;
+
             const existingEpisode = await db
                 .select()
                 .from(episodes)
@@ -59,10 +65,18 @@ export default class errorAfterClickDetector {
             if(clickEvents.length == 0)
                 continue
 
+            const allClicksOnSamePage = clickEvents.every((clickEvent) => {
+                const clickContext = EventContextValidator.context().safeParse(clickEvent.context);
+                return clickContext.success && clickContext.data.page.path === errorContext.data.page.path;
+            });
+
+            if (!allClicksOnSamePage) continue;
+
             await this.createErrorAfterClickEpisode(
                 workspaceId,
                 errorEvent,
                 clickEvents.map((event) => event.id),
+                errorContext.data,
             );
         }
     }
@@ -74,8 +88,9 @@ export default class errorAfterClickDetector {
 
     public static async createErrorAfterClickEpisode(
         workspaceId: string,
-        errorEvent: Event,
+        errorEvent: Extract<Event, { type: EventType.error }>,
         clickEventIds: string[],
+        context: EventContext,
     ) {
         const eventIds = [errorEvent.id, ...clickEventIds];
 
@@ -85,6 +100,8 @@ export default class errorAfterClickDetector {
             "visitorId": errorEvent.visitorId,
             "sessionId": errorEvent.sessionId,
             "patternType": PatternType.errorAfterClick, 
+            "errorMessage": errorEvent.payload.message,
+            context,
             "status": EpisodeStatus.active,
             "detectedAt": errorEvent.createdAt,
             "eventIds": eventIds,
