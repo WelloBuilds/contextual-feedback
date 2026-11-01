@@ -12,6 +12,7 @@ import { FindingStatus } from "../features/findings/enums/findingStatus";
 import type { PatternType } from "../features/episodes/enums/patternType";
 import { workspaces } from "./workspace.model";
 import type { Finding } from "../features/findings/types/findingType";
+import type { EventContext } from "../features/ingestion/types/eventType";
 
 export const findings = pgTable(
     "findings",
@@ -26,6 +27,7 @@ export const findings = pgTable(
         episodeCount: integer("episode_count").notNull(),
         metrics: jsonb("metrics").$type<Finding["metrics"]>().notNull(),
         confidence: numeric("confidence", { precision: 3, scale: 2 }).notNull(),
+        context: jsonb("context").$type<EventContext | null>(),
         status: text("status").$type<FindingStatus>().notNull().default(FindingStatus.candidate),
         firstSeenAt: timestamp("first_seen_at", { withTimezone: true }).notNull(),
         lastSeenAt: timestamp("last_seen_at", { withTimezone: true }).notNull(),

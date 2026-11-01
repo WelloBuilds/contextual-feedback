@@ -160,8 +160,8 @@ export default class FindingsService {
 		workspaceId: string,
 		episode: Extract<Episode, { patternType: PatternType.errorAfterClick }>,
 	) {
-
-		const samePageEpisodes = await db
+		const targetKey = JSON.stringify([episode.context.page.path, episode.errorMessage]);
+		const matchingEpisodes = await db
 			.select()
 			.from(episodes)
 			.where(and(
@@ -169,14 +169,47 @@ export default class FindingsService {
 				eq(episodes.patternType, PatternType.errorAfterClick),
 				eq(episodes.errorMessage, episode.errorMessage),
 				sql`${episodes.context}->'page'->>'path' = ${episode.context.page.path}`,
-			));
-		const uniqueVisitorIds = new Set(
-			samePageEpisodes.map((previousEpisode) => previousEpisode.visitorId)
-		);
+			))
+			.orderBy(episodes.createdAt);
+		const visitorIds = [...new Set(matchingEpisodes.map((item) => item.visitorId))];
+		if (visitorIds.length < 3) return;
 
-		if(uniqueVisitorIds.size < 3)
-			return
+		const firstSeenAt = matchingEpisodes[0].createdAt;
+		const lastSeenAt = matchingEpisodes[matchingEpisodes.length - 1].createdAt;
+		const confidence = Math.min(
+			(visitorIds.length / 10) * 0.65 + (matchingEpisodes.length / 20) * 0.35,
+			1,
+		).toFixed(2);
+		const values = {
+			targetKey,
+			evidence: { episodeIds: matchingEpisodes.map((item) => item.id), visitorIds },
+			metrics: { errorMessage: episode.errorMessage },
+			affectedVisitorCount: visitorIds.length,
+			affectedSessionCount: new Set(matchingEpisodes.map((item) => item.sessionId)).size,
+			episodeCount: matchingEpisodes.length,
+			confidence,
+			context: episode.context,
+			firstSeenAt,
+			lastSeenAt,
+		};
+		const [existingFinding] = await db.select().from(findings).where(and(
+			eq(findings.workspaceId, workspaceId),
+			eq(findings.patternType, PatternType.errorAfterClick),
+			eq(findings.targetKey, targetKey),
+		)).limit(1);
 
+		if (existingFinding) {
+			await db.update(findings).set(values).where(eq(findings.id, existingFinding.id));
+			return;
+		}
+
+		await db.insert(findings).values({
+			id: crypto.randomUUID(),
+			workspaceId,
+			patternType: PatternType.errorAfterClick,
+			...values,
+			status: FindingStatus.candidate,
+		}).onConflictDoNothing();
 	}
 
 }

@@ -1,6 +1,7 @@
 import type { FindingStatus } from "../enums/findingStatus";
 import type { PatternType } from "../../episodes/enums/patternType";
 import type { RageClickMetrics } from "./rageClickMetrics";
+import type { EventContext } from "../../ingestion/types/eventType";
 
 type FindingBase = {
 	id: string;
@@ -22,6 +23,13 @@ export type Finding = FindingBase & (
 		targetKey: string;
 		metrics: RageClickMetrics;
 		evidence: RageClickEvidence;
+	}
+	| {
+		patternType: PatternType.errorAfterClick;
+		targetKey: string;
+		context: EventContext;
+		metrics: { errorMessage: string };
+		evidence: { episodeIds: string[]; visitorIds: string[] };
 	}
 );
 
