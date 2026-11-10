@@ -1,6 +1,6 @@
 import app from ".";
 
 export default {
-  port: 3002,
+  port: 3010,
   fetch: app.fetch,
 };
