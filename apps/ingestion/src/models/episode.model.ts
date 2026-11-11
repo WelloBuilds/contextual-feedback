@@ -7,6 +7,8 @@ import {
     uuid,
 } from "drizzle-orm/pg-core";
 import { workspaces } from "./workspace.model";
+import { visitor } from "./visitor.model";
+import { sessions } from "./session.model";
 import { EpisodeStatus } from "../features/episodes/enums/episodeStatus";
 import type { PatternType } from "../features/episodes/enums/patternType";
 import type { EventContext } from "../features/ingestion/types/eventType";
@@ -16,8 +18,8 @@ export const episodes = pgTable(
     {
         id: uuid("id").primaryKey(),
         workspaceId: uuid("workspace_id").references(() => workspaces.id).notNull(),
-        visitorId: uuid("visitor_id").notNull(),
-        sessionId: uuid("session_id").notNull(),
+        visitorId: uuid("visitor_id").references(() => visitor.id).notNull(),
+        sessionId: uuid("session_id").references(() => sessions.id).notNull(),
         patternType: text("pattern_type").$type<PatternType>().notNull(),
         targetKey: text("target_key"),
         status: text("status").$type<EpisodeStatus>().notNull().default(EpisodeStatus.active),

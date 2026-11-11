@@ -1,11 +1,14 @@
-import { db } from "../../../db"
-import type { Event } from "../types/eventType"
+import { eq } from "drizzle-orm";
+import { db } from "../../../db";
 import { events as eventsTable } from "../../../models/event.model";
 import { workspaces } from "../../../models/workspace.model";
 import { workspaceOrigins } from "../../../models/workspaceOrigin.model";
 import RageClicksDetector from "../../episodes/services/RageClicksDetector";
-import { eq } from "drizzle-orm";
 import errorAfterClickDetector from "../../episodes/services/ErrorAfterClickDetector";
+import type { Event } from "../types/eventType";
+import VisitorsService from "../../visitors/services/VisitorsService";
+import SessionsService from "../../sessions/services/SessionsService";
+import EventsService from "../../events/services/EventsService";
 export default class IngestionService {
 
 	// ------------------------------------------------------------
@@ -15,35 +18,34 @@ export default class IngestionService {
         message: string,
         events: Event[]
     }> {
+		const values = events.map((event) => ({
+			id: event.id,
+			visitorId: event.visitorId,
+			workspaceId: event.workspaceId,
+			sessionId: event.sessionId,
+			type: event.type,
+			context: event.context,
+			payload: event.payload,
+			createdAt: event.createdAt,
+		}));
 
-        const values = events.map((event) => ({
-            id: event.id,
-            visitorId: event.visitorId,
-            workspaceId: event.workspaceId,
-            sessionId: event.sessionId,
-            type: event.type,
-            context: event.context ?? {},
-            payload: event.payload,
-            createdAt: event.createdAt,
-            deletedAt: null,
-        }));
+		await db.transaction(async (tx) => {
+			await VisitorsService.create(values[0].workspaceId, values[0].visitorId);
+			await SessionsService.create(values[0].sessionId, values[0].workspaceId, values[0].visitorId, values[0].createdAt);
+			await EventsService.create(events)
+		});
 
-        const insertedEvents = await db
-            .insert(eventsTable)
-            .values(values)
-            .returning();
-
-        void RageClicksDetector.detect(insertedEvents as Event[]).catch((error) => {
+        void RageClicksDetector.detect(events as Event[]).catch((error) => {
             console.error("Rage click detection failed", error);
         });
 
-        void errorAfterClickDetector.detect(insertedEvents as Event[]).catch((error) => {
+        void errorAfterClickDetector.detect(events as Event[]).catch((error) => {
             console.error("Error after click detection failed", error);
         });
 
         return {
             message: "Events received",
-            events: insertedEvents as Event[],
+            events: events as Event[],
         };
 	}
 
